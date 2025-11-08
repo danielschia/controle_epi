@@ -1,3 +1,34 @@
 from django.db import models
 
 # Create your models here.
+class Colaborador(models.Model):
+    nome = models.CharField(max_length=30)
+    sobrenome = models.CharField(max_length=30)
+    setor = models.CharField(max_length=30)
+    cpf = models.CharField(max_length=11)
+    fotoColaborador = models.ImageField(upload_to='static/fotos_colaboradores/', blank=True, null=True)
+
+class Gerente(models.Model):
+    nome = models.CharField(max_length=30)
+    sobrenome = models.CharField(max_length=30)
+    setor = models.CharField(max_length=30)
+    cpf = models.CharField(max_length=11)
+    fotoGerente = models.ImageField(upload_to='static/fotos_gerentes/', blank=True, null=True)
+
+class EPI(models.Model):
+    nomeAparelho = models.CharField(max_length=50)
+    categoria = models.CharField(max_length=30)
+    quantidade = models.IntegerField()
+    fotoEPI = models.ImageField(upload_to='static/fotos_epi/', blank=True, null=True)
+    validade = models.DateField()
+
+class Emprestimo (models.Model):
+    colaborador = models.ForeignKey(Colaborador, on_delete=models.CASCADE)
+    epi_nome = models.ForeignKey(EPI, on_delete=models.CASCADE)
+    data_emprestimo = models.DateField()
+    data_devolucao = models.DateField(blank=True, null=True)
+    condicao_retirada = models.CharField(max_length=100)
+    condicao_devolucao = models.CharField(max_length=100, blank=True, null=True)
+
+    def _str_(self):
+        return f"{self.colaborador.nome} - {self.epi_nome}"
