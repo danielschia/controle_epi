@@ -1,0 +1,55 @@
+{% extends 'epi_admin/base.html' %}
+{% block title %}Colaboradores{% endblock %}
+{% block content %}
+<h2>Colaboradores</h2>
+<p><a href="{% url 'colaborador_create' %}" class="btn">➕ Novo Colaborador</a></p>
+
+{% if colaboradores %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Sobrenome</th>
+                <th>Setor</th>
+                <th>CPF</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for colaborador in colaboradores %}
+            <tr>
+                <td>{{ colaborador.id }}</td>
+                <td><a href="{% url 'colaborador_detail' colaborador.pk %}">{{ colaborador.nome }}</a></td>
+                <td>{{ colaborador.sobrenome }}</td>
+                <td>{{ colaborador.setor }}</td>
+                <td>{{ colaborador.cpf }}</td>
+                <td>
+                    <a href="{% url 'colaborador_update' colaborador.pk %}" class="btn">✏️ Editar</a>
+                    <a href="{% url 'colaborador_delete' colaborador.pk %}" class="btn danger">🗑️ Deletar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">Primeira</a>
+                <a href="?page={{ page_obj.previous_page_number }}">← Anterior</a>
+            {% endif %}
+            <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Próxima →</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+            {% endif %}
+        </div>
+    {% endif %}
+{% else %}
+    <div class="no-items">
+        <p>Nenhum colaborador cadastrado.</p>
+        <p><a href="{% url 'colaborador_create' %}" class="btn">Criar o primeiro colaborador</a></p>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'epi_admin/base.html' %}
+{% block title %}Empréstimos{% endblock %}
+{% block content %}
+<h2>Empréstimos de EPIs</h2>
+<p><a href="{% url 'emprestimo_create' %}" class="btn">➕ Novo Empréstimo</a></p>
+
+{% if emprestimos %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Colaborador</th>
+                <th>EPI</th>
+                <th>Data Empréstimo</th>
+                <th>Data Devolução</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emprestimo in emprestimos %}
+            <tr>
+                <td>{{ emprestimo.id }}</td>
+                <td><a href="{% url 'colaborador_detail' emprestimo.colaborador.pk %}">{{ emprestimo.colaborador.nome }}</a></td>
+                <td><a href="{% url 'epi_detail' emprestimo.epi_nome.pk %}">{{ emprestimo.epi_nome.nomeAparelho }}</a></td>
+                <td>{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
+                <td>
+                    {% if emprestimo.data_devolucao %}
+                        {{ emprestimo.data_devolucao|date:"d/m/Y" }}
+                    {% else %}
+                        <span style="color: #dc3545;">⏳ Pendente</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'emprestimo_update' emprestimo.pk %}" class="btn">✏️ Editar</a>
+                    <a href="{% url 'emprestimo_delete' emprestimo.pk %}" class="btn danger">🗑️ Deletar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">Primeira</a>
+                <a href="?page={{ page_obj.previous_page_number }}">← Anterior</a>
+            {% endif %}
+            <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Próxima →</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+            {% endif %}
+        </div>
+    {% endif %}
+{% else %}
+    <div class="no-items">
+        <p>Nenhum empréstimo cadastrado.</p>
+        <p><a href="{% url 'emprestimo_create' %}" class="btn">Criar o primeiro empréstimo</a></p>
+    </div>
+{% endif %}
+{% endblock %}
