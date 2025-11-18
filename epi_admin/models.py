@@ -30,5 +30,7 @@ class Emprestimo (models.Model):
     condicao_retirada = models.CharField(max_length=100)
     condicao_devolucao = models.CharField(max_length=100, blank=True, null=True)
 
-    def _str_(self):
-        return f"{self.colaborador.nome} - {self.epi_nome}"
+    def __str__(self):
+        # mostra "Colaborador - EPI" usando o nome do aparelho
+        epi_nome = getattr(self.epi_nome, 'nomeAparelho', str(self.epi_nome))
+        return f"{self.colaborador.nome} - {epi_nome}"

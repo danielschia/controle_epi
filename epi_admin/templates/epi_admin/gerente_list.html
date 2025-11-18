@@ -1,0 +1,55 @@
+{% extends 'epi_admin/base.html' %}
+{% block title %}Gerentes{% endblock %}
+{% block content %}
+<h2>Gerentes</h2>
+<p><a href="{% url 'gerente_create' %}" class="btn">➕ Novo Gerente</a></p>
+
+{% if gerentes %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Sobrenome</th>
+                <th>Setor</th>
+                <th>CPF</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for gerente in gerentes %}
+            <tr>
+                <td>{{ gerente.id }}</td>
+                <td><a href="{% url 'gerente_detail' gerente.pk %}">{{ gerente.nome }}</a></td>
+                <td>{{ gerente.sobrenome }}</td>
+                <td>{{ gerente.setor }}</td>
+                <td>{{ gerente.cpf }}</td>
+                <td>
+                    <a href="{% url 'gerente_update' gerente.pk %}" class="btn">✏️ Editar</a>
+                    <a href="{% url 'gerente_delete' gerente.pk %}" class="btn danger">🗑️ Deletar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">Primeira</a>
+                <a href="?page={{ page_obj.previous_page_number }}">← Anterior</a>
+            {% endif %}
+            <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Próxima →</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+            {% endif %}
+        </div>
+    {% endif %}
+{% else %}
+    <div class="no-items">
+        <p>Nenhum gerente cadastrado.</p>
+        <p><a href="{% url 'gerente_create' %}" class="btn">Criar o primeiro gerente</a></p>
+    </div>
+{% endif %}
+{% endblock %}
