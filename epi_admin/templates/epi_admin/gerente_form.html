@@ -1,0 +1,13 @@
+{% extends 'epi_admin/base.html' %}
+{% block title %}{% if object %}Editar{% else %}Novo{% endif %} Gerente{% endblock %}
+{% block content %}
+<h2>{% if object %}Editar Gerente{% else %}Novo Gerente{% endif %}</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div>
+        <button type="submit" class="btn">💾 Salvar</button>
+        <a href="{% url 'gerente_list' %}" class="btn secondary">❌ Cancelar</a>
+    </div>
+</form>
+{% endblock %}

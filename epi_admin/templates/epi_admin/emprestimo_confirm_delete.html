@@ -1,0 +1,18 @@
+{% extends 'epi_admin/base.html' %}
+{% block title %}Confirmar exclusão{% endblock %}
+{% block content %}
+<h2>Confirmar Exclusão</h2>
+<div class="detail-box">
+    <p>Tem certeza que deseja excluir este empréstimo?</p>
+    <p><strong>Colaborador:</strong> {{ object.colaborador.nome }}</p>
+    <p><strong>EPI:</strong> {{ object.epi_nome.nomeAparelho }}</p>
+    <p><strong>Data Empréstimo:</strong> {{ object.data_emprestimo|date:"d/m/Y" }}</p>
+    <p style="color: #dc3545; font-weight: bold;">⚠️ Esta ação não pode ser desfeita!</p>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn danger">🗑️ Sim, Deletar</button>
+    <a href="{% url 'emprestimo_detail' object.pk %}" class="btn secondary">❌ Cancelar</a>
+</form>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'epi_admin/base.html' %}
+{% block title %}EPIs{% endblock %}
+{% block content %}
+<h2>Equipamentos de Proteção Individual (EPIs)</h2>
+<p><a href="{% url 'epi_create' %}" class="btn">➕ Novo EPI</a></p>
+
+{% if epis %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Categoria</th>
+                <th>Quantidade</th>
+                <th>Validade</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for epi in epis %}
+            <tr>
+                <td>{{ epi.id }}</td>
+                <td><a href="{% url 'epi_detail' epi.pk %}">{{ epi.nomeAparelho }}</a></td>
+                <td>{{ epi.categoria }}</td>
+                <td>{{ epi.quantidade }}</td>
+                <td>{{ epi.validade|date:"d/m/Y" }}</td>
+                <td>
+                    <a href="{% url 'epi_update' epi.pk %}" class="btn">✏️ Editar</a>
+                    <a href="{% url 'epi_delete' epi.pk %}" class="btn danger">🗑️ Deletar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">Primeira</a>
+                <a href="?page={{ page_obj.previous_page_number }}">← Anterior</a>
+            {% endif %}
+            <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Próxima →</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+            {% endif %}
+        </div>
+    {% endif %}
+{% else %}
+    <div class="no-items">
+        <p>Nenhum EPI cadastrado.</p>
+        <p><a href="{% url 'epi_create' %}" class="btn">Criar o primeiro EPI</a></p>
+    </div>
+{% endif %}
+{% endblock %}

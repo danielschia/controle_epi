@@ -1,0 +1,24 @@
+{% extends 'epi_admin/base.html' %}
+{% block title %}{{ epi.nomeAparelho }}{% endblock %}
+{% block content %}
+<h2>{{ epi.nomeAparelho }}</h2>
+<div class="detail-box">
+    <p><strong>Nome:</strong> {{ epi.nomeAparelho }}</p>
+    <p><strong>Categoria:</strong> {{ epi.categoria }}</p>
+    <p><strong>Quantidade:</strong> {{ epi.quantidade }}</p>
+    <p><strong>Validade:</strong> {{ epi.validade|date:"d/m/Y" }}</p>
+    
+    {% if epi.fotoEPI %}
+        <p><strong>Foto:</strong></p>
+        <img src="{{ epi.fotoEPI.url }}" alt="Foto de {{ epi.nomeAparelho }}">
+    {% else %}
+        <p><em>Nenhuma foto cadastrada.</em></p>
+    {% endif %}
+</div>
+
+<div>
+    <a href="{% url 'epi_update' epi.pk %}" class="btn">✏️ Editar</a>
+    <a href="{% url 'epi_delete' epi.pk %}" class="btn danger">🗑️ Deletar</a>
+    <a href="{% url 'epi_list' %}" class="btn secondary">← Voltar</a>
+</div>
+{% endblock %}
