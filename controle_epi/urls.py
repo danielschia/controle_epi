@@ -18,10 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('epi_admin/', include('epi_admin.urls')),
+    # Redirect root URL to the app's main list view
+    path('', RedirectView.as_view(pattern_name='colaborador_list', permanent=False)),
 ]
 
 if settings.DEBUG:
