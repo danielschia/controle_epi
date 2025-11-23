@@ -1,0 +1,30 @@
+{% extends 'epi_admin/base.html' %}
+{% load static %}
+
+{% block title %}Entrar - Controle de EPI{% endblock %}
+
+{% block content %}
+<h2>Entrar</h2>
+
+<form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <p>
+        <label for="id_username">Email</label>
+        {{ form.username }}
+    </p>
+
+    <p>
+        <label for="id_password">Senha</label>
+        {{ form.password }}
+    </p>
+
+    <button class="btn" type="submit">Entrar</button>
+
+    <p>
+        <a href="{% url 'password_reset' %}">Esqueci minha senha</a>
+    </p>
+</form>
+
+{% endblock %}

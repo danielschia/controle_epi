@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .models import Colaborador, Gerente, EPI, Emprestimo
@@ -7,14 +8,15 @@ from .models import Colaborador, Gerente, EPI, Emprestimo
 
 # ==================== COLABORADOR ====================
 
-class ColaboradorListView(ListView):
+class ColaboradorListView(LoginRequiredMixin, ListView):
     model = Colaborador
     template_name = 'epi_admin/colaborador_list.html'
     context_object_name = 'colaboradores'
     paginate_by = 10
 
 
-class ColaboradorCreateView(CreateView):
+class ColaboradorCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
+    permission_required = 'epi_admin.add_colaborador'
     model = Colaborador
     template_name = 'epi_admin/colaborador_form.html'
     fields = ['nome', 'sobrenome', 'setor', 'cpf', 'fotoColaborador']
@@ -25,7 +27,8 @@ class ColaboradorCreateView(CreateView):
         return super().form_valid(form)
 
 
-class ColaboradorUpdateView(UpdateView):
+class ColaboradorUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    permission_required = 'epi_admin.change_colaborador'
     model = Colaborador
     template_name = 'epi_admin/colaborador_form.html'
     fields = ['nome', 'sobrenome', 'setor', 'cpf', 'fotoColaborador']
@@ -36,7 +39,8 @@ class ColaboradorUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-class ColaboradorDeleteView(DeleteView):
+class ColaboradorDeleteView(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
+    permission_required = 'epi_admin.delete_colaborador'
     model = Colaborador
     template_name = 'epi_admin/colaborador_confirm_delete.html'
     success_url = reverse_lazy('colaborador_list')
@@ -46,7 +50,7 @@ class ColaboradorDeleteView(DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
-class ColaboradorDetailView(DetailView):
+class ColaboradorDetailView(LoginRequiredMixin, DetailView):
     model = Colaborador
     template_name = 'epi_admin/colaborador_detail.html'
     context_object_name = 'colaborador'
@@ -54,14 +58,17 @@ class ColaboradorDetailView(DetailView):
 
 # ==================== GERENTE ====================
 
-class GerenteListView(ListView):
+class GerenteListView(LoginRequiredMixin, ListView):
     model = Gerente
     template_name = 'epi_admin/gerente_list.html'
     context_object_name = 'gerentes'
     paginate_by = 10
 
 
-class GerenteCreateView(CreateView):
+class GerenteCreateView(UserPassesTestMixin, LoginRequiredMixin, CreateView):
+    # Only superusers can create Gerente objects via the UI
+    def test_func(self):
+        return self.request.user.is_superuser
     model = Gerente
     template_name = 'epi_admin/gerente_form.html'
     fields = ['nome', 'sobrenome', 'setor', 'cpf', 'fotoGerente']
@@ -72,7 +79,10 @@ class GerenteCreateView(CreateView):
         return super().form_valid(form)
 
 
-class GerenteUpdateView(UpdateView):
+class GerenteUpdateView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
+    # Only superusers can update Gerente objects via the UI
+    def test_func(self):
+        return self.request.user.is_superuser
     model = Gerente
     template_name = 'epi_admin/gerente_form.html'
     fields = ['nome', 'sobrenome', 'setor', 'cpf', 'fotoGerente']
@@ -83,7 +93,10 @@ class GerenteUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-class GerenteDeleteView(DeleteView):
+class GerenteDeleteView(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
+    # Only superusers can delete Gerente objects via the UI
+    def test_func(self):
+        return self.request.user.is_superuser
     model = Gerente
     template_name = 'epi_admin/gerente_confirm_delete.html'
     success_url = reverse_lazy('gerente_list')
@@ -93,7 +106,7 @@ class GerenteDeleteView(DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
-class GerenteDetailView(DetailView):
+class GerenteDetailView(LoginRequiredMixin, DetailView):
     model = Gerente
     template_name = 'epi_admin/gerente_detail.html'
     context_object_name = 'gerente'
@@ -101,14 +114,15 @@ class GerenteDetailView(DetailView):
 
 # ==================== EPI ====================
 
-class EPIListView(ListView):
+class EPIListView(LoginRequiredMixin, ListView):
     model = EPI
     template_name = 'epi_admin/epi_list.html'
     context_object_name = 'epis'
     paginate_by = 10
 
 
-class EPICreateView(CreateView):
+class EPICreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
+    permission_required = 'epi_admin.add_epi'
     model = EPI
     template_name = 'epi_admin/epi_form.html'
     fields = ['nomeAparelho', 'categoria', 'quantidade', 'fotoEPI', 'validade']
@@ -119,7 +133,8 @@ class EPICreateView(CreateView):
         return super().form_valid(form)
 
 
-class EPIUpdateView(UpdateView):
+class EPIUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    permission_required = 'epi_admin.change_epi'
     model = EPI
     template_name = 'epi_admin/epi_form.html'
     fields = ['nomeAparelho', 'categoria', 'quantidade', 'fotoEPI', 'validade']
@@ -130,7 +145,8 @@ class EPIUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-class EPIDeleteView(DeleteView):
+class EPIDeleteView(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
+    permission_required = 'epi_admin.delete_epi'
     model = EPI
     template_name = 'epi_admin/epi_confirm_delete.html'
     success_url = reverse_lazy('epi_list')
@@ -140,7 +156,7 @@ class EPIDeleteView(DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
-class EPIDetailView(DetailView):
+class EPIDetailView(LoginRequiredMixin, DetailView):
     model = EPI
     template_name = 'epi_admin/epi_detail.html'
     context_object_name = 'epi'
@@ -148,14 +164,15 @@ class EPIDetailView(DetailView):
 
 # ==================== EMPRESTIMO ====================
 
-class EmprestimoListView(ListView):
+class EmprestimoListView(LoginRequiredMixin, ListView):
     model = Emprestimo
     template_name = 'epi_admin/emprestimo_list.html'
     context_object_name = 'emprestimos'
     paginate_by = 10
 
 
-class EmprestimoCreateView(CreateView):
+class EmprestimoCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
+    permission_required = 'epi_admin.add_emprestimo'
     model = Emprestimo
     template_name = 'epi_admin/emprestimo_form.html'
     fields = ['colaborador', 'epi_nome', 'data_emprestimo', 'condicao_retirada']
@@ -166,7 +183,8 @@ class EmprestimoCreateView(CreateView):
         return super().form_valid(form)
 
 
-class EmprestimoUpdateView(UpdateView):
+class EmprestimoUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    permission_required = 'epi_admin.change_emprestimo'
     model = Emprestimo
     template_name = 'epi_admin/emprestimo_form.html'
     fields = ['colaborador', 'epi_nome', 'data_emprestimo', 'data_devolucao', 'condicao_retirada', 'condicao_devolucao']
@@ -177,7 +195,8 @@ class EmprestimoUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-class EmprestimoDeleteView(DeleteView):
+class EmprestimoDeleteView(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
+    permission_required = 'epi_admin.delete_emprestimo'
     model = Emprestimo
     template_name = 'epi_admin/emprestimo_confirm_delete.html'
     success_url = reverse_lazy('emprestimo_list')
@@ -187,7 +206,7 @@ class EmprestimoDeleteView(DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
-class EmprestimoDetailView(DetailView):
+class EmprestimoDetailView(LoginRequiredMixin, DetailView):
     model = Emprestimo
     template_name = 'epi_admin/emprestimo_detail.html'
     context_object_name = 'emprestimo'

@@ -126,3 +126,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Authentication: allow login by email (custom backend) while keeping default backend
+AUTHENTICATION_BACKENDS = [
+    'epi_admin.auth_backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# Redirects after login/logout
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'  # after login go to root (redirects to colaborador list)
+LOGOUT_REDIRECT_URL = '/accounts/login/'
