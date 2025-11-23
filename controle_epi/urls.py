@@ -25,7 +25,7 @@ urlpatterns = [
     path('epi_admin/', include('epi_admin.urls')),
     # Redirect root URL to the app's main list view
     path('', RedirectView.as_view(pattern_name='colaborador_list', permanent=False)),
-    # Authentication URLs (login/logout/password management)
+    # Authentication URLs (login/password management)
     path('accounts/', include('django.contrib.auth.urls')),
 ]
 

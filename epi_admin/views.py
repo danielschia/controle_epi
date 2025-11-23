@@ -1,10 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import logout as auth_logout
+from django.http import HttpResponseRedirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .models import Colaborador, Gerente, EPI, Emprestimo
 
+
+
+# ==================== CUSTOM LOGOUT ====================
+def custom_logout(request):
+    auth_logout(request)
+    return HttpResponseRedirect('/?logged_out=1')
 
 # ==================== COLABORADOR ====================
 

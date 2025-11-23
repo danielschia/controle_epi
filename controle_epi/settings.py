@@ -136,4 +136,4 @@ AUTHENTICATION_BACKENDS = [
 # Redirects after login/logout
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'  # after login go to root (redirects to colaborador list)
-LOGOUT_REDIRECT_URL = '/accounts/login/'
+LOGOUT_REDIRECT_URL = '/?logged_out=1'
