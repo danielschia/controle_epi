@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 # Create your models here.
@@ -9,6 +10,7 @@ class Colaborador(models.Model):
     fotoColaborador = models.ImageField(upload_to='static/fotos_colaboradores/', blank=True, null=True)
 
 class Gerente(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)
     nome = models.CharField(max_length=30)
     sobrenome = models.CharField(max_length=30)
     setor = models.CharField(max_length=30)
