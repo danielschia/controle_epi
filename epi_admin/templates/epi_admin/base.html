@@ -16,6 +16,11 @@
             <a href="{% url 'gerente_list' %}">Gerentes</a>
             <a href="{% url 'epi_list' %}">EPIs</a>
             <a href="{% url 'emprestimo_list' %}">Empréstimos</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}">Sair</a>
+            {% else %}
+                <a href="{% url 'login' %}">Entrar</a>
+            {% endif %}
         </nav>
     </header>
     <main>
