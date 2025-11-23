@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .models import Colaborador, Gerente, EPI, Emprestimo
+from .forms import EPIForm, EmprestimoForm
 
 
 
@@ -132,8 +133,8 @@ class EPIListView(LoginRequiredMixin, ListView):
 class EPICreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     permission_required = 'epi_admin.add_epi'
     model = EPI
+    form_class = EPIForm
     template_name = 'epi_admin/epi_form.html'
-    fields = ['nomeAparelho', 'categoria', 'quantidade', 'fotoEPI', 'validade']
     success_url = reverse_lazy('epi_list')
 
     def form_valid(self, form):
@@ -144,8 +145,8 @@ class EPICreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
 class EPIUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     permission_required = 'epi_admin.change_epi'
     model = EPI
+    form_class = EPIForm
     template_name = 'epi_admin/epi_form.html'
-    fields = ['nomeAparelho', 'categoria', 'quantidade', 'fotoEPI', 'validade']
     success_url = reverse_lazy('epi_list')
 
     def form_valid(self, form):
@@ -182,8 +183,8 @@ class EmprestimoListView(LoginRequiredMixin, ListView):
 class EmprestimoCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     permission_required = 'epi_admin.add_emprestimo'
     model = Emprestimo
+    form_class = EmprestimoForm
     template_name = 'epi_admin/emprestimo_form.html'
-    fields = ['colaborador', 'epi_nome', 'data_emprestimo', 'condicao_retirada']
     success_url = reverse_lazy('emprestimo_list')
 
     def form_valid(self, form):
@@ -194,8 +195,8 @@ class EmprestimoCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateVi
 class EmprestimoUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     permission_required = 'epi_admin.change_emprestimo'
     model = Emprestimo
+    form_class = EmprestimoForm
     template_name = 'epi_admin/emprestimo_form.html'
-    fields = ['colaborador', 'epi_nome', 'data_emprestimo', 'data_devolucao', 'condicao_retirada', 'condicao_devolucao']
     success_url = reverse_lazy('emprestimo_list')
 
     def form_valid(self, form):
