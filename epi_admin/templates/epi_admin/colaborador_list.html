@@ -1,6 +1,9 @@
 {% extends 'epi_admin/base.html' %}
 {% block title %}Colaboradores{% endblock %}
 {% block content %}
+{% if request.GET.logged_out %}
+    <div class="alert alert-success" style="margin-bottom: 1em;">Sessão encerrada com sucesso.</div>
+{% endif %}
 <h2>Colaboradores</h2>
 <p><a href="{% url 'colaborador_create' %}" class="btn">➕ Novo Colaborador</a></p>
 
@@ -32,7 +35,7 @@
             {% endfor %}
         </tbody>
     </table>
-    
+
     {% if is_paginated %}
         <div class="pagination">
             {% if page_obj.has_previous %}
