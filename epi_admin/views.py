@@ -21,7 +21,7 @@ class ColaboradorCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateV
     template_name = 'epi_admin/colaborador_form.html'
     fields = ['nome', 'sobrenome', 'setor', 'cpf', 'fotoColaborador']
     success_url = reverse_lazy('colaborador_list')
-    
+
     def form_valid(self, form):
         messages.success(self.request, f'Colaborador {form.cleaned_data["nome"]} criado com sucesso!')
         return super().form_valid(form)
@@ -33,7 +33,7 @@ class ColaboradorUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateV
     template_name = 'epi_admin/colaborador_form.html'
     fields = ['nome', 'sobrenome', 'setor', 'cpf', 'fotoColaborador']
     success_url = reverse_lazy('colaborador_list')
-    
+
     def form_valid(self, form):
         messages.success(self.request, f'Colaborador {form.cleaned_data["nome"]} atualizado com sucesso!')
         return super().form_valid(form)
@@ -44,7 +44,7 @@ class ColaboradorDeleteView(PermissionRequiredMixin, LoginRequiredMixin, DeleteV
     model = Colaborador
     template_name = 'epi_admin/colaborador_confirm_delete.html'
     success_url = reverse_lazy('colaborador_list')
-    
+
     def delete(self, request, *args, **kwargs):
         messages.success(request, 'Colaborador deletado com sucesso!')
         return super().delete(request, *args, **kwargs)
@@ -73,7 +73,7 @@ class GerenteCreateView(UserPassesTestMixin, LoginRequiredMixin, CreateView):
     template_name = 'epi_admin/gerente_form.html'
     fields = ['nome', 'sobrenome', 'setor', 'cpf', 'fotoGerente']
     success_url = reverse_lazy('gerente_list')
-    
+
     def form_valid(self, form):
         messages.success(self.request, f'Gerente {form.cleaned_data["nome"]} criado com sucesso!')
         return super().form_valid(form)
@@ -87,7 +87,7 @@ class GerenteUpdateView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
     template_name = 'epi_admin/gerente_form.html'
     fields = ['nome', 'sobrenome', 'setor', 'cpf', 'fotoGerente']
     success_url = reverse_lazy('gerente_list')
-    
+
     def form_valid(self, form):
         messages.success(self.request, f'Gerente {form.cleaned_data["nome"]} atualizado com sucesso!')
         return super().form_valid(form)
@@ -100,7 +100,7 @@ class GerenteDeleteView(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
     model = Gerente
     template_name = 'epi_admin/gerente_confirm_delete.html'
     success_url = reverse_lazy('gerente_list')
-    
+
     def delete(self, request, *args, **kwargs):
         messages.success(request, 'Gerente deletado com sucesso!')
         return super().delete(request, *args, **kwargs)
@@ -127,7 +127,7 @@ class EPICreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     template_name = 'epi_admin/epi_form.html'
     fields = ['nomeAparelho', 'categoria', 'quantidade', 'fotoEPI', 'validade']
     success_url = reverse_lazy('epi_list')
-    
+
     def form_valid(self, form):
         messages.success(self.request, f'EPI {form.cleaned_data["nomeAparelho"]} criado com sucesso!')
         return super().form_valid(form)
@@ -139,7 +139,7 @@ class EPIUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     template_name = 'epi_admin/epi_form.html'
     fields = ['nomeAparelho', 'categoria', 'quantidade', 'fotoEPI', 'validade']
     success_url = reverse_lazy('epi_list')
-    
+
     def form_valid(self, form):
         messages.success(self.request, f'EPI {form.cleaned_data["nomeAparelho"]} atualizado com sucesso!')
         return super().form_valid(form)
@@ -150,7 +150,7 @@ class EPIDeleteView(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
     model = EPI
     template_name = 'epi_admin/epi_confirm_delete.html'
     success_url = reverse_lazy('epi_list')
-    
+
     def delete(self, request, *args, **kwargs):
         messages.success(request, 'EPI deletado com sucesso!')
         return super().delete(request, *args, **kwargs)
@@ -177,7 +177,7 @@ class EmprestimoCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateVi
     template_name = 'epi_admin/emprestimo_form.html'
     fields = ['colaborador', 'epi_nome', 'data_emprestimo', 'condicao_retirada']
     success_url = reverse_lazy('emprestimo_list')
-    
+
     def form_valid(self, form):
         messages.success(self.request, 'Empréstimo criado com sucesso!')
         return super().form_valid(form)
@@ -189,7 +189,7 @@ class EmprestimoUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateVi
     template_name = 'epi_admin/emprestimo_form.html'
     fields = ['colaborador', 'epi_nome', 'data_emprestimo', 'data_devolucao', 'condicao_retirada', 'condicao_devolucao']
     success_url = reverse_lazy('emprestimo_list')
-    
+
     def form_valid(self, form):
         messages.success(self.request, 'Empréstimo atualizado com sucesso!')
         return super().form_valid(form)
@@ -200,7 +200,7 @@ class EmprestimoDeleteView(PermissionRequiredMixin, LoginRequiredMixin, DeleteVi
     model = Emprestimo
     template_name = 'epi_admin/emprestimo_confirm_delete.html'
     success_url = reverse_lazy('emprestimo_list')
-    
+
     def delete(self, request, *args, **kwargs):
         messages.success(request, 'Empréstimo deletado com sucesso!')
         return super().delete(request, *args, **kwargs)
