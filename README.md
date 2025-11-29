@@ -56,8 +56,12 @@ python manage.py migrate
 
 ### 5. Iniciar o servidor
 
+```bash
+python manage.py runserver
+```
+
 O servidor criará automaticamente:
-- Superuser padrão (`controle_epi@example.local`)
+- Superuser padrão (configure via variáveis de ambiente)
 - Grupo de Gerentes com permissões
 - Usuários de teste e colaboradores de exemplo
 
@@ -81,7 +85,7 @@ A aplicação estará disponível em: **http://127.0.0.1:8000/**
 ## 🔐 Autenticação
 
 - Use **email** para fazer login
-- Exemplos de emails: `controle_epi@example.local`, `gerente1@example.local`
+- Configure usuários e senhas via variáveis de ambiente (veja `README_DEV.md`)
 
 Para maiores detalhes sobre usuários, grupos, permissões e troubleshooting, veja [`README_DEV.md`](./README_DEV.md).
 
