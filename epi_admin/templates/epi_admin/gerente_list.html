@@ -28,10 +28,6 @@
                     {% if user.is_superuser or gerente.user and gerente.user.id == user.id %}
                         <a href="{% url 'gerente_update' gerente.pk %}" class="btn">✏️ Editar</a>
                     {% endif %}
-
-                    {% if user.is_superuser or gerente.user and gerente.user.id == user.id %}
-                        <a href="{% url 'gerente_delete' gerente.pk %}" class="btn danger">🗑️ Deletar</a>
-                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
