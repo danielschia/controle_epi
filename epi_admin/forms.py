@@ -109,6 +109,23 @@ class EmprestimoForm(forms.ModelForm):
             'condicao_retirada': 'Condição na Retirada',
             'condicao_devolucao': 'Condição na Devolução',
         }
+        def clean_epi_nome(self):
+            """
+            Valida se o EPI selecionado tem quantidade maior que zero.
+            """
+            epi = self.cleaned_data.get("epi_nome")
+
+            if epi:
+                # Recarrega a instância do EPI do banco de dados para garantir a quantidade atual
+                epi.refresh_from_db()
+
+                if epi.quantidade <= 0:
+                    raise forms.ValidationError(
+                        f"O EPI '{epi.nomeAparelho}' está indisponível no estoque (Quantidade: {epi.quantidade})."
+                    )
+
+            return epi
+
     def clean(self):
         cleaned_data = super().clean()
 
