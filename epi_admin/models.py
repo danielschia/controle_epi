@@ -17,6 +17,9 @@ class Colaborador(models.Model):
         related_name='colaboradores_created'
     )
 
+    def __str__(self):
+        return f"{self.nome} {self.sobrenome}"
+
 class Gerente(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)
     nome = models.CharField(max_length=30)
@@ -25,12 +28,18 @@ class Gerente(models.Model):
     cpf = models.CharField(max_length=11)
     fotoGerente = models.ImageField(upload_to='static/fotos_gerentes/', blank=True, null=True)
 
+    def __str__(self):
+        return f"{self.nome} {self.sobrenome}"
+
 class EPI(models.Model):
     nomeAparelho = models.CharField(max_length=50)
     categoria = models.CharField(max_length=30)
     quantidade = models.IntegerField()
     fotoEPI = models.ImageField(upload_to='static/fotos_epi/', blank=True, null=True)
     validade = models.DateField()
+
+    def __str__(self):
+        return self.nomeAparelho
 
 class Emprestimo (models.Model):
     colaborador = models.ForeignKey(Colaborador, on_delete=models.CASCADE)
