@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .models import Colaborador, Gerente, EPI, Emprestimo
-from .forms import EPIForm, EmprestimoForm
+from .forms import ColaboradorForm, GerenteForm, EPIForm, EmprestimoForm
 
 
 
@@ -27,8 +27,8 @@ class ColaboradorListView(LoginRequiredMixin, ListView):
 class ColaboradorCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     permission_required = 'epi_admin.add_colaborador'
     model = Colaborador
+    form_class = ColaboradorForm
     template_name = 'epi_admin/colaborador_form.html'
-    fields = ['nome', 'sobrenome', 'setor', 'cpf', 'fotoColaborador']
     success_url = reverse_lazy('colaborador_list')
 
     def form_valid(self, form):
@@ -41,8 +41,8 @@ class ColaboradorCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateV
 class ColaboradorUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     permission_required = 'epi_admin.change_colaborador'
     model = Colaborador
+    form_class = ColaboradorForm
     template_name = 'epi_admin/colaborador_form.html'
-    fields = ['nome', 'sobrenome', 'setor', 'cpf', 'fotoColaborador']
     success_url = reverse_lazy('colaborador_list')
 
     def form_valid(self, form):
@@ -88,8 +88,8 @@ class GerenteCreateView(UserPassesTestMixin, LoginRequiredMixin, CreateView):
     def test_func(self):
         return self.request.user.is_superuser
     model = Gerente
+    form_class = GerenteForm
     template_name = 'epi_admin/gerente_form.html'
-    fields = ['nome', 'sobrenome', 'setor', 'cpf', 'fotoGerente']
     success_url = reverse_lazy('gerente_list')
 
     def form_valid(self, form):
@@ -110,8 +110,8 @@ class GerenteUpdateView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
         return False
 
     model = Gerente
+    form_class = GerenteForm
     template_name = 'epi_admin/gerente_form.html'
-    fields = ['nome', 'sobrenome', 'setor', 'cpf', 'fotoGerente']
     success_url = reverse_lazy('gerente_list')
 
     def form_valid(self, form):

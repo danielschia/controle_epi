@@ -1,0 +1,7 @@
+{% if widget.image_url %}
+<div style="margin-bottom: 15px;">
+    <p><strong>Imagem atual:</strong></p>
+    <img src="{{ widget.image_url }}" alt="Imagem" style="max-width: 200px; max-height: 200px; border-radius: 4px; border: 1px solid #ddd;">
+</div>
+{% endif %}
+<input type="file" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
