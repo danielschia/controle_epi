@@ -12,18 +12,24 @@
 </head>
 <body>
     <header>
-        <h1><a href="{% url 'colaborador_list' %}">🛡️ Controle de EPI</a></h1>
-        <nav>
-            <a href="{% url 'colaborador_list' %}">Colaboradores</a>
-            <a href="{% url 'gerente_list' %}">Gerentes</a>
-            <a href="{% url 'epi_list' %}">EPIs</a>
-            <a href="{% url 'emprestimo_list' %}">Empréstimos</a>
-            {% if user.is_authenticated %}
-                <a href="{% url 'custom_logout' %}">Sair</a>
-            {% else %}
-                <a href="{% url 'login' %}">Entrar</a>
-            {% endif %}
-        </nav>
+        <div class="header-content">
+            <div class="logo-section">
+                <!-- Logo: coloque logo.png ou logo.svg na pasta static/epi_admin/images/ -->
+                <img src="{% static 'epi_admin/images/logo.png' %}" alt="Logo Cadeiras Datena" class="logo">
+                <h1><a href="{% url 'colaborador_list' %}">Controle de EPI</a></h1>
+            </div>
+            <nav>
+                <a href="{% url 'colaborador_list' %}">Colaboradores</a>
+                <a href="{% url 'gerente_list' %}">Gerentes</a>
+                <a href="{% url 'epi_list' %}">EPIs</a>
+                <a href="{% url 'emprestimo_list' %}">Empréstimos</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'custom_logout' %}">Sair</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Entrar</a>
+                {% endif %}
+            </nav>
+        </div>
     </header>
     <main>
         {% if messages %}
