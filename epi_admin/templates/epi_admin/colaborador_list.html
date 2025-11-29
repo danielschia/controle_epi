@@ -28,8 +28,13 @@
                 <td>{{ colaborador.setor }}</td>
                 <td>{{ colaborador.cpf }}</td>
                 <td>
-                    <a href="{% url 'colaborador_update' colaborador.pk %}" class="btn">✏️ Editar</a>
-                    <a href="{% url 'colaborador_delete' colaborador.pk %}" class="btn danger">🗑️ Deletar</a>
+                    {% if user.is_superuser or colaborador.created_by and colaborador.created_by.id == user.id and perms.epi_admin.change_colaborador%}
+                        <a href="{% url 'colaborador_update' colaborador.pk %}" class="btn">✏️ Editar</a>
+                    {% endif %}
+
+                    {% if user.is_superuser or colaborador.created_by and colaborador.created_by.id == user.id and perms.epi_admin.change_colaborador%}
+                        <a href="{% url 'colaborador_delete' colaborador.pk %}" class="btn danger">🗑️ Deletar</a>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

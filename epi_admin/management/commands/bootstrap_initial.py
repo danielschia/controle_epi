@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 import logging
 import os
+from django.core.management import call_command
 
 
 class Command(BaseCommand):
@@ -43,6 +44,12 @@ class Command(BaseCommand):
 
             # Test gerente users are provided via fixtures. Developers can load them
             # with 'python manage.py loaddata epi_admin/fixtures/gerentes.json'.
+            # Additionally, create test users and sample colaboradores automatically.
+            try:
+                call_command('create_test_users')
+                logger.info('Ran create_test_users to ensure test gerentes and colaboradores exist')
+            except Exception:
+                logger.exception('Failed to run create_test_users')
 
         except Exception as e:
             logger.exception('bootstrap_initial failed: %s', e)
