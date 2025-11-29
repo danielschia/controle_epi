@@ -1,4 +1,5 @@
 {% extends 'epi_admin/base.html' %}
+{% load static %}
 {% block title %}{% if object %}Editar{% else %}Novo{% endif %} Empréstimo{% endblock %}
 {% block content %}
 <h2>{% if object %}Editar Empréstimo{% else %}Novo Empréstimo{% endif %}</h2>
@@ -10,4 +11,5 @@
         <a href="{% url 'emprestimo_list' %}" class="btn secondary">❌ Cancelar</a>
     </div>
 </form>
+
 {% endblock %}

@@ -22,7 +22,7 @@ class EPIAdmin(django_admin.ModelAdmin):
 class EmprestimoAdmin(django_admin.ModelAdmin):
     list_display = ('id', 'colaborador', 'epi_nome', 'data_emprestimo', 'data_devolucao')
     search_fields = ('colaborador__nome', 'epi_nome__nomeAparelho')
-    list_filter = ('data_emprestimo',)
+    list_filter = ('data_emprestimo', 'data_devolucao', 'data_prevista',)
 
 
 # Register models with the custom admin site (so only superusers can access it)
