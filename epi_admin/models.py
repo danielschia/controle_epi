@@ -1,5 +1,8 @@
 from django.conf import settings
 from django.db import models
+from datetime import date, timedelta
+from django.db.models import CheckConstraint, Q
+
 
 # Create your models here.
 class Colaborador(models.Model):
@@ -45,6 +48,7 @@ class Emprestimo (models.Model):
     colaborador = models.ForeignKey(Colaborador, on_delete=models.CASCADE)
     epi_nome = models.ForeignKey(EPI, on_delete=models.CASCADE)
     data_emprestimo = models.DateField()
+    data_prevista = models.DateField(blank=True, null=True)
     data_devolucao = models.DateField(blank=True, null=True)
     condicao_retirada = models.CharField(max_length=100)
     condicao_devolucao = models.CharField(max_length=100, blank=True, null=True)
@@ -53,3 +57,18 @@ class Emprestimo (models.Model):
         # mostra "Colaborador - EPI" usando o nome do aparelho
         epi_nome = getattr(self.epi_nome, 'nomeAparelho', str(self.epi_nome))
         return f"{self.colaborador.nome} - {epi_nome}"
+
+    class Meta:
+        # Define a restrição que o DB irá impor
+        constraints = [
+            CheckConstraint(
+                condition=Q(data_prevista__gt=models.F('data_emprestimo')),
+                name='data_prevista_maior_que_emprestimo'
+            )
+        ]
+
+    def save(self, *args, **kwargs):
+        if not self.id: # Apenas se for um novo objeto (primeiro save)
+            if not self.data_prevista and self.data_emprestimo:
+                self.data_prevista = self.data_emprestimo + timedelta(days=7)
+        super().save(*args, **kwargs)

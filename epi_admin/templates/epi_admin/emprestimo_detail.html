@@ -6,16 +6,17 @@
     <p><strong>Colaborador:</strong> <a href="{% url 'colaborador_detail' emprestimo.colaborador.pk %}">{{ emprestimo.colaborador.nome }} {{ emprestimo.colaborador.sobrenome }}</a></p>
     <p><strong>EPI:</strong> <a href="{% url 'epi_detail' emprestimo.epi_nome.pk %}">{{ emprestimo.epi_nome.nomeAparelho }}</a></p>
     <p><strong>Data Empréstimo:</strong> {{ emprestimo.data_emprestimo|date:"d/m/Y" }}</p>
-    
+    <p><strong>Data Entrega Prevista:</strong> {{ emprestimo.data_prevista|date:"d/m/Y" }}</p>
+
     {% if emprestimo.data_devolucao %}
         <p><strong>Data Devolução:</strong> {{ emprestimo.data_devolucao|date:"d/m/Y" }}</p>
         <p><span style="color: #28a745; font-weight: bold;">✓ Devolvido</span></p>
     {% else %}
         <p><strong>Data Devolução:</strong> <span style="color: #dc3545;">Pendente</span></p>
     {% endif %}
-    
+
     <p><strong>Condição da Retirada:</strong> {{ emprestimo.condicao_retirada }}</p>
-    
+
     {% if emprestimo.condicao_devolucao %}
         <p><strong>Condição da Devolução:</strong> {{ emprestimo.condicao_devolucao }}</p>
     {% else %}

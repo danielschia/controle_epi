@@ -75,7 +75,12 @@ class EmprestimoForm(forms.ModelForm):
         widget=forms.DateInput(format=DATE_FORMAT, attrs={'placeholder': 'DD/MM/YY', 'class': 'datepicker', 'autocomplete': 'off'})
     )
     data_devolucao = forms.DateField(
-        required=False,
+        required=True,
+        input_formats=[DATE_FORMAT],
+        widget=forms.DateInput(format=DATE_FORMAT, attrs={'placeholder': 'DD/MM/YY', 'class': 'datepicker', 'autocomplete': 'off'})
+    )
+    data_prevista = forms.DateField(
+        required=True,
         input_formats=[DATE_FORMAT],
         widget=forms.DateInput(format=DATE_FORMAT, attrs={'placeholder': 'DD/MM/YY', 'class': 'datepicker', 'autocomplete': 'off'})
     )
@@ -83,6 +88,7 @@ class EmprestimoForm(forms.ModelForm):
             'colaborador': 'Colaborador',
             'epi_nome': 'EPI',
             'data_emprestimo': 'Data de Empréstimo',
+            'data_prevista': 'Data Prevista',
             'data_devolucao': 'Data de Devolução',
             'condicao_retirada': 'Condição na Retirada',
             'condicao_devolucao': 'Condição na Devolução',
@@ -90,12 +96,36 @@ class EmprestimoForm(forms.ModelForm):
 
     class Meta:
         model = Emprestimo
-        fields = ['colaborador', 'epi_nome', 'data_emprestimo', 'data_devolucao', 'condicao_retirada', 'condicao_devolucao']
+        fields = ['colaborador', 'epi_nome', 'data_emprestimo', 'data_prevista', 'data_devolucao', 'condicao_retirada', 'condicao_devolucao']
         labels = {
             'colaborador': 'Colaborador',
             'epi_nome': 'EPI',
             'data_emprestimo': 'Data de Empréstimo',
+            'data_prevista': 'Data Prevista',
             'data_devolucao': 'Data de Devolução',
             'condicao_retirada': 'Condição na Retirada',
             'condicao_devolucao': 'Condição na Devolução',
         }
+    def clean(self):
+        cleaned_data = super().clean()
+
+        data_emprestimo = cleaned_data.get("data_emprestimo")
+        data_prevista = cleaned_data.get("data_prevista")
+        data_devolucao = cleaned_data.get("data_devolucao")
+
+         # Verifica se ambas as datas foram fornecidas
+
+        if data_emprestimo and data_prevista:
+            # Compara as datas (objetos date do Python)
+            if data_prevista <= data_emprestimo:
+                # Se a condição for inválida, levanta um erro de validação
+                raise forms.ValidationError(
+                    "A data prevista para devolução deve ser posterior à data de empréstimo."
+                )
+            elif data_devolucao <= data_emprestimo:
+                raise forms.ValidationError(
+                    "A data de devolução deve ser posterior à data de empréstimo."
+                )
+
+        # Retorna o dicionário de dados limpos (obrigatório)
+        return cleaned_data
