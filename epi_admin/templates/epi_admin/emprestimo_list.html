@@ -34,7 +34,9 @@
                 </td>
                 <td>
                     <a href="{% url 'emprestimo_update' emprestimo.pk %}" class="btn">✏️ Editar</a>
-                    <a href="{% url 'emprestimo_delete' emprestimo.pk %}" class="btn danger">🗑️ Deletar</a>
+                    {% if not emprestimo.data_devolucao %}
+                        <a href="{% url 'emprestimo_delete' emprestimo.pk %}" class="btn danger">🗑️ Deletar</a>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
