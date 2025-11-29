@@ -71,11 +71,13 @@ class EPIForm(forms.ModelForm):
 
 class EmprestimoForm(forms.ModelForm):
     data_emprestimo = forms.DateField(
+        label='Data de Empréstimo',
         input_formats=[DATE_FORMAT],
         widget=forms.DateInput(format=DATE_FORMAT, attrs={'placeholder': 'DD/MM/YY', 'class': 'datepicker', 'autocomplete': 'off'})
     )
     data_devolucao = forms.DateField(
-        required=True,
+        label='Registrar devolução',
+        required=False,
         input_formats=[DATE_FORMAT],
         widget=forms.DateInput(format=DATE_FORMAT, attrs={'placeholder': 'DD/MM/YY', 'class': 'datepicker', 'autocomplete': 'off'})
     )
@@ -89,7 +91,7 @@ class EmprestimoForm(forms.ModelForm):
             'epi_nome': 'EPI',
             'data_emprestimo': 'Data de Empréstimo',
             'data_prevista': 'Data Prevista',
-            'data_devolucao': 'Data de Devolução',
+            'data_devolucao': 'Registrar Devolução',
             'condicao_retirada': 'Condição na Retirada',
             'condicao_devolucao': 'Condição na Devolução',
         }
@@ -102,7 +104,7 @@ class EmprestimoForm(forms.ModelForm):
             'epi_nome': 'EPI',
             'data_emprestimo': 'Data de Empréstimo',
             'data_prevista': 'Data Prevista',
-            'data_devolucao': 'Data de Devolução',
+            'data_devolucao': 'Registrar Devolução',
             'condicao_retirada': 'Condição na Retirada',
             'condicao_devolucao': 'Condição na Devolução',
         }

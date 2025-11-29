@@ -3,6 +3,11 @@ from django.db import models
 from datetime import date, timedelta
 from django.db.models import CheckConstraint, Q
 
+CONDICAO_CHOICES = (
+    ('BOA', 'Boa'),
+    ('USAVEL', 'Usável'),
+    ('RUIM', 'Ruim'),
+)
 
 # Create your models here.
 class Colaborador(models.Model):
@@ -49,9 +54,16 @@ class Emprestimo (models.Model):
     epi_nome = models.ForeignKey(EPI, on_delete=models.CASCADE)
     data_emprestimo = models.DateField()
     data_prevista = models.DateField(blank=True, null=True)
-    data_devolucao = models.DateField(blank=True, null=True)
-    condicao_retirada = models.CharField(max_length=100)
-    condicao_devolucao = models.CharField(max_length=100, blank=True, null=True)
+    data_devolucao = models.DateField("Registrar Devolução", blank=True, null=True)
+    condicao_retirada = models.CharField(max_length=10,
+                                        choices=CONDICAO_CHOICES,
+                                        default='BOA'
+                                        )
+    condicao_devolucao = models.CharField(max_length=10,
+                                        choices=CONDICAO_CHOICES,
+                                        blank=True,
+                                        null=True
+                                        )
 
     def __str__(self):
         # mostra "Colaborador - EPI" usando o nome do aparelho
