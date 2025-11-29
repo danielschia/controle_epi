@@ -32,6 +32,8 @@ class ColaboradorCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateV
     success_url = reverse_lazy('colaborador_list')
 
     def form_valid(self, form):
+        if self.request.user.is_authenticated:
+            form.instance.created_by = self.request.user
         messages.success(self.request, f'Colaborador {form.cleaned_data["nome"]} criado com sucesso!')
         return super().form_valid(form)
 
@@ -48,11 +50,18 @@ class ColaboradorUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateV
         return super().form_valid(form)
 
 
-class ColaboradorDeleteView(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
-    permission_required = 'epi_admin.delete_colaborador'
+class ColaboradorDeleteView(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
     model = Colaborador
     template_name = 'epi_admin/colaborador_confirm_delete.html'
     success_url = reverse_lazy('colaborador_list')
+
+    def test_func(self):
+        user = self.request.user
+        if user.is_superuser:
+            return True
+        obj = self.get_object()
+        # require both ownership and delete permission
+        return obj.created_by == user and user.has_perm('epi_admin.delete_colaborador')
 
     def delete(self, request, *args, **kwargs):
         messages.success(request, 'Colaborador deletado com sucesso!')
