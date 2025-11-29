@@ -98,9 +98,17 @@ class GerenteCreateView(UserPassesTestMixin, LoginRequiredMixin, CreateView):
 
 
 class GerenteUpdateView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
-    # Only superusers can update Gerente objects via the UI
+    # Superusers can update any Gerente; regular gerentes can update only themselves
     def test_func(self):
-        return self.request.user.is_superuser
+        obj = self.get_object()
+        # Allow if superuser OR if the gerente's user account matches the current user
+        if self.request.user.is_superuser:
+            return True
+        # For non-superusers: check if obj.user exists and matches current user
+        if obj.user and obj.user == self.request.user:
+            return True
+        return False
+
     model = Gerente
     template_name = 'epi_admin/gerente_form.html'
     fields = ['nome', 'sobrenome', 'setor', 'cpf', 'fotoGerente']
@@ -112,9 +120,17 @@ class GerenteUpdateView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
 
 
 class GerenteDeleteView(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
-    # Only superusers can delete Gerente objects via the UI
+    # Superusers can delete any Gerente; regular gerentes can delete only themselves
     def test_func(self):
-        return self.request.user.is_superuser
+        obj = self.get_object()
+        # Allow if superuser OR if the gerente's user account matches the current user
+        if self.request.user.is_superuser:
+            return True
+        # For non-superusers: check if obj.user exists and matches current user
+        if obj.user and obj.user == self.request.user:
+            return True
+        return False
+
     model = Gerente
     template_name = 'epi_admin/gerente_confirm_delete.html'
     success_url = reverse_lazy('gerente_list')
