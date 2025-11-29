@@ -175,6 +175,9 @@ form {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     margin-bottom: 20px;
 }
+form > div {
+    margin-bottom: 20px;
+}
 form p {
     margin-bottom: 15px;
 }
@@ -182,6 +185,7 @@ label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
+    color: #333;
 }
 input, textarea, select {
     width: 100%;
@@ -195,6 +199,15 @@ input:focus, textarea:focus, select:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+}
+/* Estilos para imagens em formulários */
+form img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    display: block;
+    margin: 10px 0;
 }
 .detail-box {
     background: white;
