@@ -1,4 +1,4 @@
-{% extends 'epi_admin/base.html' %}
+ {% extends 'epi_admin/base.html' %}
 {% block title %}Gerentes{% endblock %}
 {% block content %}
 <h2>Gerentes</h2>
@@ -25,14 +25,19 @@
                 <td>{{ gerente.setor }}</td>
                 <td>{{ gerente.cpf }}</td>
                 <td>
-                    <a href="{% url 'gerente_update' gerente.pk %}" class="btn">✏️ Editar</a>
-                    <a href="{% url 'gerente_delete' gerente.pk %}" class="btn danger">🗑️ Deletar</a>
+                    {% if user.is_superuser or gerente.user and gerente.user.id == user.id and perms.epi_admin.change_gerente %}
+                        <a href="{% url 'gerente_update' gerente.pk %}" class="btn">✏️ Editar</a>
+                    {% endif %}
+
+                    {% if user.is_superuser or gerente.user and gerente.user.id == user.id and perms.epi_admin.change_gerente %}
+                        <a href="{% url 'gerente_delete' gerente.pk %}" class="btn danger">🗑️ Deletar</a>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    
+
     {% if is_paginated %}
         <div class="pagination">
             {% if page_obj.has_previous %}

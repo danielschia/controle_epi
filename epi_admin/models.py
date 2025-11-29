@@ -9,6 +9,14 @@ class Colaborador(models.Model):
     cpf = models.CharField(max_length=11)
     fotoColaborador = models.ImageField(upload_to='static/fotos_colaboradores/', blank=True, null=True)
 
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='colaboradores_created'
+    )
+
 class Gerente(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)
     nome = models.CharField(max_length=30)
