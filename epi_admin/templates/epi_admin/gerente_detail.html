@@ -7,7 +7,7 @@
     <p><strong>Sobrenome:</strong> {{ gerente.sobrenome }}</p>
     <p><strong>Setor:</strong> {{ gerente.setor }}</p>
     <p><strong>CPF:</strong> {{ gerente.cpf }}</p>
-    
+
     {% if gerente.fotoGerente %}
         <p><strong>Foto:</strong></p>
         <img src="{{ gerente.fotoGerente.url }}" alt="Foto de {{ gerente.nome }}">
@@ -18,7 +18,9 @@
 
 <div>
     <a href="{% url 'gerente_update' gerente.pk %}" class="btn">✏️ Editar</a>
-    <a href="{% url 'gerente_delete' gerente.pk %}" class="btn danger">🗑️ Deletar</a>
+    {% if user.is_superuser or gerente.user and gerente.user.id == user.id and perms.epi_admin.change_gerente %}
+        <a href="{% url 'gerente_delete' gerente.pk %}" class="btn danger">🗑️ Deletar</a>
+    {% endif %}
     <a href="{% url 'gerente_list' %}" class="btn secondary">← Voltar</a>
 </div>
 {% endblock %}

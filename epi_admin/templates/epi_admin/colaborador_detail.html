@@ -7,7 +7,7 @@
     <p><strong>Sobrenome:</strong> {{ colaborador.sobrenome }}</p>
     <p><strong>Setor:</strong> {{ colaborador.setor }}</p>
     <p><strong>CPF:</strong> {{ colaborador.cpf }}</p>
-    
+
     {% if colaborador.fotoColaborador %}
         <p><strong>Foto:</strong></p>
         <img src="{{ colaborador.fotoColaborador.url }}" alt="Foto de {{ colaborador.nome }}">
@@ -18,7 +18,9 @@
 
 <div>
     <a href="{% url 'colaborador_update' colaborador.pk %}" class="btn">✏️ Editar</a>
-    <a href="{% url 'colaborador_delete' colaborador.pk %}" class="btn danger">🗑️ Deletar</a>
+    {% if user.is_superuser or colaborador.created_by and colaborador.created_by.id == user.id and perms.epi_admin.change_colaborador%}
+        <a href="{% url 'colaborador_delete' colaborador.pk %}" class="btn danger">🗑️ Deletar</a>
+    {% endif %}
     <a href="{% url 'colaborador_list' %}" class="btn secondary">← Voltar</a>
 </div>
 {% endblock %}
