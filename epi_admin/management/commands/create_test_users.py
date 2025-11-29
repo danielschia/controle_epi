@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
-from epi_admin.models import Colaborador
+from epi_admin.models import Colaborador, Gerente
 import random
 
 
@@ -84,6 +84,18 @@ class Command(BaseCommand):
             if not user.groups.filter(name=group_name).exists():
                 user.groups.add(group)
                 self.stdout.write(self.style.SUCCESS(f"Added {username} to group '{group_name}'"))
+
+            # Create or update associated Gerente object (idempotent)
+            gerente, created = Gerente.objects.get_or_create(user=user)
+            if created:
+                gerente.nome = username.capitalize()
+                gerente.sobrenome = "Test"
+                gerente.setor = "Geral"
+                gerente.cpf = ''.join(str(random.randint(0, 9)) for _ in range(11))
+                gerente.save()
+                self.stdout.write(self.style.SUCCESS(f"Created Gerente for user: {username}"))
+            else:
+                self.stdout.write(f"Gerente already exists for user: {username}")
 
             # Create up to 3 Colaborador records for this gerente (idempotent)
             try:
