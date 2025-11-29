@@ -12,6 +12,7 @@
                 <th>Colaborador</th>
                 <th>EPI</th>
                 <th>Data Empréstimo</th>
+                <th>Data Prevista</th>
                 <th>Data Devolução</th>
                 <th>Ações</th>
             </tr>
@@ -23,6 +24,7 @@
                 <td><a href="{% url 'colaborador_detail' emprestimo.colaborador.pk %}">{{ emprestimo.colaborador.nome }}</a></td>
                 <td><a href="{% url 'epi_detail' emprestimo.epi_nome.pk %}">{{ emprestimo.epi_nome.nomeAparelho }}</a></td>
                 <td>{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
+                <td>{{ emprestimo.data_prevista|date:"d/m/Y" }}</td>
                 <td>
                     {% if emprestimo.data_devolucao %}
                         {{ emprestimo.data_devolucao|date:"d/m/Y" }}
@@ -38,7 +40,7 @@
             {% endfor %}
         </tbody>
     </table>
-    
+
     {% if is_paginated %}
         <div class="pagination">
             {% if page_obj.has_previous %}
