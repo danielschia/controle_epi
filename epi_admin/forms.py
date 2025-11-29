@@ -1,3 +1,4 @@
+from datetime import date
 from django import forms
 from .models import EPI, Emprestimo, Colaborador, Gerente
 
@@ -115,19 +116,12 @@ class EmprestimoForm(forms.ModelForm):
         data_prevista = cleaned_data.get("data_prevista")
         data_devolucao = cleaned_data.get("data_devolucao")
 
-         # Verifica se ambas as datas foram fornecidas
 
-        if data_emprestimo and data_prevista:
-            # Compara as datas (objetos date do Python)
+        if isinstance(data_emprestimo, date) and isinstance(data_prevista, date):
+            # Agora a comparação é segura
             if data_prevista <= data_emprestimo:
-                # Se a condição for inválida, levanta um erro de validação
                 raise forms.ValidationError(
                     "A data prevista para devolução deve ser posterior à data de empréstimo."
                 )
-            elif data_devolucao <= data_emprestimo:
-                raise forms.ValidationError(
-                    "A data de devolução deve ser posterior à data de empréstimo."
-                )
 
-        # Retorna o dicionário de dados limpos (obrigatório)
         return cleaned_data
