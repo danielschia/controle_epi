@@ -1,0 +1,15 @@
+# Project runtime dependencies
+Django==5.2.8
+# Use a Pillow version with prebuilt wheels for newer Pythons; bump if you hit build problems
+Pillow>=9.6.0
+
+# Development / testing
+pytest>=7.0
+pytest-django>=4.0
+
+# Optional / convenience (uncomment if you use a .env file)
+# python-dotenv>=1.0
+
+# Notes:
+# - Pins chosen to match the project guidance; adapt versions as needed for your environment.
+# - To install: `python -m pip install -r requirements.txt` (with your virtualenv active).
