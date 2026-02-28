@@ -1,5 +1,7 @@
 from datetime import date
 from django import forms
+from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
 from .models import EPI, Emprestimo, Colaborador, Gerente
 
 
@@ -36,10 +38,12 @@ class ColaboradorForm(forms.ModelForm):
 class GerenteForm(forms.ModelForm):
     class Meta:
         model = Gerente
-        fields = ['nome', 'sobrenome', 'setor', 'cpf', 'fotoGerente']
+        # incluímos 'email' no formulário do model
+        fields = ['nome', 'sobrenome', 'email', 'setor', 'cpf', 'fotoGerente']
         labels = {
             'nome': 'Nome',
             'sobrenome': 'Sobrenome',
+            'email': 'Email',
             'setor': 'Setor',
             'cpf': 'CPF',
             'fotoGerente': 'Foto do Gerente',
@@ -47,6 +51,33 @@ class GerenteForm(forms.ModelForm):
         widgets = {
             'fotoGerente': ImagePreviewWidget(),
         }
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if not email:
+            raise ValidationError('O email é obrigatório.')
+
+        # normalize
+        email = email.strip().lower()
+
+        # check uniqueness among Gerente (exclude self)
+        qs = Gerente.objects.filter(email__iexact=email)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise ValidationError('Já existe um gerente com este email.')
+
+        # check if a User exists with that email and is linked to a different Gerente
+        User = get_user_model()
+        user_qs = User.objects.filter(email__iexact=email)
+        if user_qs.exists():
+            user = user_qs.first()
+            # find gerente linked to that user (if any)
+            other = Gerente.objects.filter(user_id=user.pk).exclude(pk=getattr(self.instance, 'pk', None)).first()
+            if other:
+                raise ValidationError('Esse email já está vinculado a outro gerente.')
+
+        return email
 
 
 class EPIForm(forms.ModelForm):

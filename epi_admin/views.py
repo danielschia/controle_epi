@@ -5,6 +5,9 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.utils.crypto import get_random_string
 from .models import Colaborador, Gerente, EPI, Emprestimo
 from .forms import ColaboradorForm, GerenteForm, EPIForm, EmprestimoForm
 
@@ -93,8 +96,46 @@ class GerenteCreateView(UserPassesTestMixin, LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('gerente_list')
 
     def form_valid(self, form):
+        # salva a instância primeiro
+        response = super().form_valid(form)
+        # sincroniza/garante que exista um User associado com o email informado
+        email = form.cleaned_data.get('email')
+        if email:
+            User = get_user_model()
+            gerente = self.object
+            # Se já houver usuário associado, atualiza o email
+            if getattr(gerente, 'user', None):
+                user = gerente.user
+                user.email = email
+                user.save()
+            else:
+                # tenta encontrar um usuário existente com o mesmo email
+                try:
+                    user = User.objects.get(email=email)
+                    gerente.user = user
+                    gerente.save()
+                except User.DoesNotExist:
+                    # somente superuser pode criar novo usuário automaticamente
+                    if self.request.user.is_superuser:
+                        # use the full email as the username so login with email works
+                        username = email
+                        password = User.objects.make_random_password()
+                        user = User.objects.create_user(username=username, email=email, password=password)
+                        # marca como staff e adiciona ao grupo Gerentes se existir
+                        user.is_staff = True
+                        try:
+                            group = Group.objects.get(name='Gerentes')
+                            user.groups.add(group)
+                        except Group.DoesNotExist:
+                            pass
+                        user.save()
+                        gerente.user = user
+                        gerente.save()
+                        messages.info(self.request, f'Usuário "{user.username}" criado para o gerente; defina a senha via Admin.')
+                    else:
+                        messages.warning(self.request, 'Usuário com esse email não existe e apenas admin pode criá-lo automaticamente.')
         messages.success(self.request, f'Gerente {form.cleaned_data["nome"]} criado com sucesso!')
-        return super().form_valid(form)
+        return response
 
 
 class GerenteUpdateView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
@@ -115,8 +156,44 @@ class GerenteUpdateView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('gerente_list')
 
     def form_valid(self, form):
+        # salva a instância primeiro
+        response = super().form_valid(form)
+        # sincroniza email com o User associado
+        email = form.cleaned_data.get('email')
+        if email:
+            User = get_user_model()
+            gerente = self.object
+            if getattr(gerente, 'user', None):
+                user = gerente.user
+                user.email = email
+                user.save()
+            else:
+                try:
+                    user = User.objects.get(email=email)
+                    gerente.user = user
+                    gerente.save()
+                except User.DoesNotExist:
+                    # se o gerente atual estiver atualizando e não houver user, não criamos automaticamente
+                    # apenas superuser pode criar usuário automaticamente
+                    if self.request.user.is_superuser:
+                        # use the full email as the username so login with email works
+                        username = email
+                        password = User.objects.make_random_password()
+                        user = User.objects.create_user(username=username, email=email, password=password)
+                        user.is_staff = True
+                        try:
+                            group = Group.objects.get(name='Gerentes')
+                            user.groups.add(group)
+                        except Group.DoesNotExist:
+                            pass
+                        user.save()
+                        gerente.user = user
+                        gerente.save()
+                        messages.info(self.request, f'Usuário "{user.username}" criado para o gerente; defina a senha via Admin.')
+                    else:
+                        messages.warning(self.request, 'Usuário com esse email não existe e apenas admin pode criá-lo automaticamente.')
         messages.success(self.request, f'Gerente {form.cleaned_data["nome"]} atualizado com sucesso!')
-        return super().form_valid(form)
+        return response
 
 
 class GerenteDeleteView(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
