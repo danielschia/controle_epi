@@ -31,6 +31,10 @@ class Colaborador(models.Model):
 
 class Gerente(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)
+    # email do gerente; será usado como username para login quando possível
+    # email do gerente; será usado como username para login.
+    # Tornaremos este campo obrigatório (não nulo) via migrações controladas.
+    email = models.EmailField(max_length=254, unique=True, blank=False, null=False)
     nome = models.CharField(max_length=30)
     sobrenome = models.CharField(max_length=30)
     setor = models.CharField(max_length=30)

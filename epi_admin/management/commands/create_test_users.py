@@ -74,11 +74,16 @@ class Command(BaseCommand):
                 else:
                     self.stdout.write(f"User exists: {username} (use --force to reset password)")
             else:
-                user = User(username=username, email=email, is_staff=True)
-                user.set_password(password)
-                user.save()
-                self.stdout.write(self.style.SUCCESS(f"Created user: {username} / {email}"))
-                created_any = True
+                # avoid IntegrityError: check whether a user with username==email already exists
+                if User.objects.filter(username=email).exists():
+                    user = User.objects.get(username=email)
+                    self.stdout.write(self.style.WARNING(f"Found existing user with username=email: {user.username}. Using existing account."))
+                else:
+                    user = User.objects.create_user(username=email, email=email, password=password)
+                    user.is_staff = True
+                    user.save()
+                    self.stdout.write(self.style.SUCCESS(f"Created user: {user.username} / {email}"))
+                    created_any = True
 
             # Add user to group if not already
             if not user.groups.filter(name=group_name).exists():
@@ -86,16 +91,33 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f"Added {username} to group '{group_name}'"))
 
             # Create or update associated Gerente object (idempotent)
-            gerente, created = Gerente.objects.get_or_create(user=user)
+            # ensure we provide a unique cpf and set the email to user.email when creating
+            cpf_candidate = ''.join(str(random.randint(0, 9)) for _ in range(11))
+            while Gerente.objects.filter(cpf=cpf_candidate).exists():
+                cpf_candidate = ''.join(str(random.randint(0, 9)) for _ in range(11))
+
+            defaults = {
+                'nome': username.capitalize(),
+                'sobrenome': 'Test',
+                'setor': 'Geral',
+                'cpf': cpf_candidate,
+                'email': user.email,
+            }
+
+            gerente, created = Gerente.objects.get_or_create(user=user, defaults=defaults)
             if created:
-                gerente.nome = username.capitalize()
-                gerente.sobrenome = "Test"
-                gerente.setor = "Geral"
-                gerente.cpf = ''.join(str(random.randint(0, 9)) for _ in range(11))
-                gerente.save()
-                self.stdout.write(self.style.SUCCESS(f"Created Gerente for user: {username}"))
+                self.stdout.write(self.style.SUCCESS(f"Created Gerente for user: {user.username}"))
             else:
-                self.stdout.write(f"Gerente already exists for user: {username}")
+                # if gerent exists but email is missing or different, ensure it's synced
+                updated = False
+                if gerente.email != user.email:
+                    gerente.email = user.email
+                    updated = True
+                if updated:
+                    gerente.save()
+                    self.stdout.write(self.style.SUCCESS(f"Updated Gerente email for user: {user.username}"))
+                else:
+                    self.stdout.write(f"Gerente already exists for user: {user.username}")
 
             # Create up to 3 Colaborador records for this gerente (idempotent)
             try:

@@ -1,203 +1,290 @@
-# 🛡️ Controle de EPI
+# 🛡️ Controle de EPI — Guia Completo
 
-Sistema de controle e gerenciamento de Equipamentos de Proteção Individual (EPI) desenvolvido com Django.
+Este repositório contém um aplicativo Django para controlar Equipamentos de Proteção Individual (EPI), colaboradores, gerentes e empréstimos.
 
-## 📋 Visão Geral
+Este README foi consolidado para incluir tudo necessário para configurar e rodar o projeto tanto em macOS quanto em Windows (PowerShell / CMD). Para detalhes exclusivamente de desenvolvimento (dicas, fixtures, comandos extras) veja também `README_DEV.md`.
 
-Este é um aplicativo web para gerenciar:
-- **Colaboradores**: Registro de funcionários
-- **Gerentes**: Usuários administradores que gerenciam colaboradores
-- **EPIs**: Equipamentos de proteção individual e seu controle
-- **Empréstimos**: Rastreamento de empréstimos de EPI aos colaboradores
+Índice rápido
+- Pré-requisitos
+- Instalação (macOS / Linux e Windows)
+- Variáveis de ambiente
+- Migrações e banco de dados
+- Criar usuário(s) e seed/test data
+- Rodar servidor
+- Resetar banco (opções)
+- Media/Uploads
+- Testes
+- Problemas comuns / Troubleshooting
+- Desenvolvimento e contribuições
+
+---
 
 ## 🚀 Pré-requisitos
 
-- Python 3.11+
-- Django 5.2+
-- SQLite3 (padrão)
-- pip (gerenciador de pacotes Python)
+- Python 3.11+ (recomendado)
+- pip
+- (opcional) virtualenv / venv
+- SQLite (já incluído no Python padrão — usado por padrão neste projeto)
 
-## 📦 Instalação
+Recomendado: use um ambiente virtual para isolar dependências.
 
-### 1. Clonar o repositório
+---
+
+## 📦 Instalação e first-run (macOS / Linux)
+
+Abra um terminal e execute:
 
 ```bash
-git clone https://github.com/seu-usuario/controle_epi.git
+# clone (se ainda não clonou)
+git clone <REPO_URL>
 cd controle_epi/controle_epi
-```
 
-### 2. Criar e ativar o ambiente virtual
-
-```bash
+# criar e ativar venv (bash/zsh)
 python -m venv .venv
 source .venv/bin/activate
-# no Windows:
-# .venv\Scripts\activate
-```
 
-### 3. Instalar dependências
-
-```bash
+# instalar dependências
 pip install -r requirements.txt
-```
 
-Se não existir `requirements.txt`, instale manualmente:
-
-```bash
-pip install Django==5.2.8 Pillow
-```
-
-### 4. Aplicar migrações do banco de dados
-
-```bash
-python manage.py makemigrations epi_admin
+# aplicar migrações
 python manage.py migrate
-```
 
-### 5. Iniciar o servidor
+# criar superuser (interativo)
+python manage.py createsuperuser
 
-```bash
+# (opcional) criar usuários de teste e colaboradores
+python manage.py create_test_users
+
+# iniciar servidor de desenvolvimento
 python manage.py runserver
 ```
 
-O servidor criará automaticamente:
-- Superuser padrão (configure via variáveis de ambiente)
-- Grupo de Gerentes com permissões
-- Usuários de teste e colaboradores de exemplo
+Em seguida, acesse: http://127.0.0.1:8000/ (aplicação) e http://127.0.0.1:8000/admin/ (admin).
 
-Para detalhes de configuração manual, veja [`README_DEV.md`](./README_DEV.md).
+---
 
-## 🏃 Executando a Aplicação
+## � Instalação e first-run (Windows — PowerShell)
 
-### Iniciar o servidor de desenvolvimento
+Abra PowerShell e execute:
 
-```bash
+```powershell
+git clone <REPO_URL>
+cd .\controle_epi\controle_epi
+
+# criar e ativar venv (PowerShell)
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+# instalar dependências
+pip install -r requirements.txt
+
+# aplicar migrações
+python manage.py migrate
+
+# criar superuser
+python manage.py createsuperuser
+
+# (opcional) criar usuários de teste
+python manage.py create_test_users
+
+# iniciar servidor
 python manage.py runserver
 ```
 
-A aplicação estará disponível em: **http://127.0.0.1:8000/**
+No CMD (Prompt) o comando para ativar o venv é:
 
-### Acessar a interface
+```cmd
+.venv\Scripts\activate
+```
 
-- **Aplicação principal**: http://127.0.0.1:8000/
-- **Admin (superuser only)**: http://127.0.0.1:8000/admin/
+---
 
-## 🔐 Autenticação
+## 🔧 Variáveis de ambiente úteis
 
-- Use **email** para fazer login
-- Configure usuários e senhas via variáveis de ambiente (veja `README_DEV.md`)
+Você pode definir as seguintes variáveis (ex.: em `.env` ou no ambiente):
 
-Para maiores detalhes sobre usuários, grupos, permissões e troubleshooting, veja [`README_DEV.md`](./README_DEV.md).
+- `DJANGO_SECRET_KEY` — chave secreta Django (produção)
+- `DJANGO_SUPERUSER_USERNAME` — username do superuser criado automaticamente
+- `DJANGO_SUPERUSER_EMAIL` — email do superuser
+- `DJANGO_SUPERUSER_PASSWORD` — senha do superuser
+- `DJANGO_GERENTE_PASSWORD` — senha padrão de gerentes de teste (usado por scripts)
 
-## 📊 Funcionalidades Principais
+Exemplo `.env` (não comite este arquivo em repositórios públicos):
 
-### Colaboradores
-
-- Listar, criar, editar e deletar colaboradores
-- Apenas o criador (ou superuser) pode editar/deletar
-- Campos: nome, sobrenome, setor, CPF, foto
-
-### EPIs
-
-- Controle de equipamentos de proteção
-- Data de validade com datepicker (formato DD/MM/YY)
-- Quantidade em estoque
-- Foto do equipamento
-
-### Empréstimos
-
-- Registrar quando um colaborador retira um EPI
-- Rastrear devolução com data e condições
-- Datas com datepicker (formato DD/MM/YY)
-
-### Gerentes
-
-- Apenas superusers podem criar/editar gerentes
-- Cada gerente tem uma conta de usuário Django associada
-- Pode editar apenas sua própria conta
-
-## 🛠️ Configuração Avançada
-
-### Variáveis de Ambiente (Desenvolvimento)
-
-Crie um arquivo `.env` na raiz do projeto (opcional):
-
-```env
-DJANGO_SECRET_KEY=sua-chave-secreta-aqui
+```
+DJANGO_SECRET_KEY=troque-por-uma-chave-secreta
 DJANGO_SUPERUSER_USERNAME=controle_epi
 DJANGO_SUPERUSER_EMAIL=controle_epi@senai.sc.com
-DJANGO_SUPERUSER_PASSWORD=sua-senha-forte
+DJANGO_SUPERUSER_PASSWORD=senhaSegura123
 DJANGO_GERENTE_PASSWORD=gerente
 ```
 
-### Estrutura de Diretórios
+---
 
-```
-controle_epi/
-├── controle_epi/              # Configuração do projeto
-│   ├── settings.py            # Configurações Django
-│   ├── urls.py                # Rotas do projeto
-│   ├── admin_site.py          # Admin customizado
-│   └── wsgi.py                # WSGI para deploy
-├── epi_admin/                 # App principal
-│   ├── models.py              # Modelos de dados
-│   ├── views.py               # Vistas (controllers)
-│   ├── urls.py                # Rotas da app
-│   ├── forms.py               # Formulários
-│   ├── static/                # CSS, JS, imagens
-│   ├── templates/             # Templates HTML
-│   └── management/commands/   # Comandos customizados
-├── manage.py                  # Script de gerenciamento Django
-├── db.sqlite3                 # Banco de dados (SQLite)
-└── requirements.txt           # Dependências Python
-```
+## 🗂️ Migrações e banco de dados
 
-## 📝 Comandos Úteis
-
-### Gerenciamento de Usuários
-
-Veja [`README_DEV.md`](./README_DEV.md) para:
-- Criar superuser
-- Criar usuários de teste (gerentes e colaboradores)
-- Mudar senhas
-- Gerenciar permissões
-
-### Banco de Dados
+- Criar novas migrações (após mudanças em models):
 
 ```bash
-# Ver migrações pendentes
-python manage.py showmigrations
-
-# Aplicar migrações
+python manage.py makemigrations
 python manage.py migrate
-
-# Criar novas migrações
-python manage.py makemigrations epi_admin
-
-# Resetar banco (⚠️ Apaga tudo)
-python manage.py flush
 ```
 
-### Desenvolvimento
+- Verificar migrações pendentes:
 
 ```bash
-# Shell interativo Django
-python manage.py shell
-
-# Executar testes
-python manage.py test
-
-# Coletador de static files (necessário para produção)
-python manage.py collectstatic
+python manage.py showmigrations
 ```
 
-## 🎨 Customização do Admin
+Observação: o projeto usa SQLite por padrão (`db.sqlite3` no diretório do projeto). Em produção recomendamos usar Postgres ou outro serviço de banco e configurar `DATABASES` em `controle_epi/settings.py`.
 
-O Django admin foi customizado para a aplicação:
+---
 
-- **URL**: http://127.0.0.1:8000/admin/
-- **Acesso**: Apenas superusers
-- **Branding**: Logo e cores personalizadas
+## 👥 Usuários, grupos e seed data
+
+- O projeto cria automaticamente o grupo `Gerentes` com permissões essenciais.
+- Para criar contas de teste (gerente1 e gerente2) execute:
+
+```bash
+python manage.py create_test_users
+# --force para resetar senhas
+python manage.py create_test_users --force
+```
+
+- Você também pode carregar fixtures (se presente):
+
+```bash
+python manage.py loaddata epi_admin/fixtures/gerentes.json
+```
+
+Notas importantes:
+- `create_test_users` é idempotente: não criará duplicatas.
+- O sistema foi configurado para usar email como `username` quando criamos usuários automaticamente — o fluxo de login usa email.
+
+---
+
+## ▶️ Rodar servidor de desenvolvimento
+
+```bash
+python manage.py runserver
+```
+
+Acesse: http://127.0.0.1:8000/
+
+Se preferir executar em background/porta diferente:
+
+```bash
+python manage.py runserver 0.0.0.0:8000
+```
+
+---
+
+## ♻️ Resetar o banco de dados (duas opções)
+
+ATENÇÃO: esses comandos são destrutivos. Faça backup antes de prosseguir.
+
+Opção A — reset simples (recomendado para dev):
+
+```bash
+# pare o servidor
+cp db.sqlite3 db.sqlite3.bak   # backup
+rm db.sqlite3
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py create_test_users
+```
+
+Opção B — reset completo (apaga também histórico de migrations):
+
+```bash
+git checkout -b reset-migrations-backup
+cp db.sqlite3 db.sqlite3.bak
+# remover arquivos de migrations (mantendo __init__.py)
+find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+find . -path "*/migrations/*.pyc" -delete
+rm db.sqlite3
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py create_test_users
+```
+
+Windows (PowerShell) equivalente para remover migrations:
+
+```powershell
+# execute com cuidado
+Get-ChildItem -Path . -Recurse -Include "migrations" | ForEach-Object {
+	Get-ChildItem $_.FullName -Filter "*.py" | Where-Object { $_.Name -ne "__init__.py" } | Remove-Item -Force
+}
+```
+
+Se algo der errado, restaure com:
+
+```bash
+cp db.sqlite3.bak db.sqlite3
+```
+
+---
+
+## 📁 Media / uploads
+
+Uploads são gravados na pasta `media/` (ver `settings.py`).
+
+Para apagar arquivos de upload ao resetar o projeto:
+
+```bash
+rm -rf media/
+mkdir media
+```
+
+No Windows (PowerShell):
+
+```powershell
+Remove-Item -Recurse -Force .\media\
+New-Item -ItemType Directory -Path .\media\
+```
+
+---
+
+## ✅ Testes
+
+Para rodar os testes unitários do projeto:
+
+```bash
+python manage.py test
+```
+
+---
+
+## 🐞 Troubleshooting (comuns)
+
+- Erro `no such table`: rode `python manage.py migrate` antes de executar comandos que acessam o DB.
+- Erro `UNIQUE constraint failed: ...`: podem existir registros duplicados; revisar a tabela e remover/ajustar manualmente ou restaurar do backup.
+- Problemas com ambiente virtual: verifique se ativou o venv correto (`.venv/bin/activate` no macOS, `.venv\Scripts\activate` no Windows).
+
+Se precisar de ajuda, cole a saída do terminal e eu ajudo a diagnosticar.
+
+---
+
+## 🛠️ Desenvolvimento & contribuições
+
+1. Crie uma branch para sua feature: `git checkout -b feature/sua-feature`
+2. Commit suas mudanças: `git add -A && git commit -m 'Adiciona sua feature'`
+3. Push para o branch: `git push origin feature/sua-feature`
+4. Abra um Pull Request
+
+Para desenvolvedores: veja `README_DEV.md` para detalhes de fixtures, scripts de bootstrap e recomendações de fluxo de trabalho.
+
+---
+
+## 📚 Links úteis
+
+- Django: https://docs.djangoproject.com/
+- Django Admin: https://docs.djangoproject.com/en/5.2/ref/contrib/admin/
+
+---
+
+Última atualização: 2026-02-28
 - **CSS customizado**: `epi_admin/static/admin/css/custom_admin.css`
 
 ## 📅 Formato de Datas
