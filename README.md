@@ -248,11 +248,35 @@ New-Item -ItemType Directory -Path .\media\
 
 ## ✅ Testes
 
-Para rodar os testes unitários do projeto:
+Existem duas formas comuns de executar os testes neste projeto.
+
+1) Usando o runner padrão do Django:
 
 ```bash
 python manage.py test
 ```
+
+2) Usando pytest (recomendado para desenvolvimento):
+
+```bash
+# ative seu venv (bash/zsh)
+source .venv/bin/activate
+
+# instale dependências (inclui pytest/pytest-django)
+python -m pip install -r requirements.txt
+
+# executar pytest
+pytest -q
+```
+
+Observações:
+- `requirements.txt` já inclui `pytest` e `pytest-django` para facilitar a execução local e em CI.
+- Os testes usam fixtures do `pytest-django` (ex.: `django_user_model`, `client`).
+- Há uma fixture autouse que isola `MEDIA_ROOT` durante os testes para evitar poluir a árvore do projeto.
+
+CI / integração contínua
+
+- Recomendo adicionar um workflow que execute `pip install -r requirements.txt` e `pytest -q` em cada PR.
 
 ---
 
