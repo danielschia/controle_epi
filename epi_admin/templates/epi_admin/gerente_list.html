@@ -12,6 +12,7 @@
                 <th>Sobrenome</th>
                 <th>Setor</th>
                 <th>CPF</th>
+                <th>Email</th>
                 <th>Ações</th>
             </tr>
         </thead>
@@ -23,6 +24,7 @@
                 <td>{{ gerente.sobrenome }}</td>
                 <td>{{ gerente.setor }}</td>
                 <td>{{ gerente.cpf }}</td>
+                <td>{{ gerente.user.email }}</td>
                 <td>
                     {% if user.is_superuser or gerente.user and gerente.user.id == user.id %}
                         <a href="{% url 'gerente_update' gerente.pk %}" class="btn">✏️ Editar</a>
