@@ -22,13 +22,14 @@ class ImagePreviewWidget(forms.FileInput):
 class ColaboradorForm(forms.ModelForm):
     class Meta:
         model = Colaborador
-        fields = ['nome', 'sobrenome', 'setor', 'cpf', 'fotoColaborador']
+        fields = ['nome', 'sobrenome', 'setor', 'cpf', 'fotoColaborador', 'is_ativo']
         labels = {
             'nome': 'Nome',
             'sobrenome': 'Sobrenome',
             'setor': 'Setor',
             'cpf': 'CPF',
             'fotoColaborador': 'Foto do Colaborador',
+            'is_ativo': 'Ativo',
         }
         widgets = {
             'fotoColaborador': ImagePreviewWidget(),
@@ -159,7 +160,6 @@ class EmprestimoForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-
         data_emprestimo = cleaned_data.get("data_emprestimo")
         data_prevista = cleaned_data.get("data_prevista")
         data_devolucao = cleaned_data.get("data_devolucao")
