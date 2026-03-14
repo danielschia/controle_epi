@@ -11,43 +11,47 @@ class EpiAdminConfig(AppConfig):
 
         This runs on app startup. It is idempotent and safe to call multiple times.
         If the database isn't ready (during migrations), we quietly skip creation.
+
+        We defer database setup until the app is fully ready by using Django's
+        app registry to avoid "Accessing the database during app initialization" warnings.
         """
         logger = logging.getLogger(__name__)
-        try:
-            import os
-            from django.contrib.auth import get_user_model
-            from django.contrib.auth.models import Group, Permission
-            from django.db import OperationalError, ProgrammingError
 
-            # Only ensure the 'Gerentes' group and its permissions exist here. Creation
-            # of the superuser and test accounts is handled by the management command
-            # `bootstrap_initial`, which can be invoked at server start.
-            User = get_user_model()
+        # Defer database setup until Django signals that apps are ready
+        from django.core.management import call_command
+        from django.db.models.signals import post_migrate
+        from django.dispatch import receiver
 
-            # Ensure the 'Gerentes' group with permissions for colaborador, epi and emprestimo only.
-            models = ['colaborador', 'epi', 'emprestimo']
-            actions = ['add', 'change', 'delete', 'view']
-            codenames = [f"{action}_{model}" for model in models for action in actions]
+        @receiver(post_migrate)
+        def setup_groups_and_permissions(sender, **kwargs):
+            """Called after migrations complete; safe to access the database."""
+            try:
+                from django.contrib.auth import get_user_model
+                from django.contrib.auth.models import Group, Permission
+                from django.db import OperationalError, ProgrammingError
 
-            perms = Permission.objects.filter(codename__in=codenames, content_type__app_label='epi_admin')
+                User = get_user_model()
 
-            group, created = Group.objects.get_or_create(name='Gerentes')
-            if created:
-                logger.info("Created 'Gerentes' group")
-            # Assign permissions (idempotent)
-            if perms.exists():
-                group.permissions.add(*perms)
-                logger.info("Assigned permissions to 'Gerentes' group")
-            else:
-                logger.debug("No permissions found to assign to 'Gerentes' group (content types may not be ready yet)")
-            # Note: creation of test gerente users is handled by the management
-            # command `bootstrap_initial` (invoked from manage.py/runserver). We
-            # avoid creating test users here to prevent duplicate entries during
-            # app startup (apps.ready runs on import). Only group/permission
-            # setup is performed in this method.
-        except (OperationalError, ProgrammingError) as e:
-            # Database not ready (e.g., during migrate). Skip silently but log at debug level.
-            logger.debug("Skipping automatic Gerentes group creation because DB is not ready: %s", e)
-        except Exception as e:
-            # Catch-all to avoid crashing app startup; log the error.
-            logger.exception("Unexpected error while creating 'Gerentes' group: %s", e)
+                # Ensure the 'Gerentes' group with permissions for colaborador, epi and emprestimo only.
+                models = ['colaborador', 'epi', 'emprestimo']
+                actions = ['add', 'change', 'delete', 'view']
+                codenames = [f"{action}_{model}" for model in models for action in actions]
+
+                perms = Permission.objects.filter(codename__in=codenames, content_type__app_label='epi_admin')
+
+                group, created = Group.objects.get_or_create(name='Gerentes')
+                if created:
+                    logger.info("Created 'Gerentes' group")
+                # Assign permissions (idempotent)
+                if perms.exists():
+                    group.permissions.add(*perms)
+                    logger.info("Assigned permissions to 'Gerentes' group")
+                else:
+                    logger.debug("No permissions found to assign to 'Gerentes' group (content types may not be ready yet)")
+            except (OperationalError, ProgrammingError) as e:
+                # Database not ready. Skip silently but log at debug level.
+                logger.debug("Skipping Gerentes group creation because DB is not ready: %s", e)
+
+        # Connect the signal only once (avoid duplicate signals on app reload)
+        post_migrate.connect(setup_groups_and_permissions, weak=False)
+

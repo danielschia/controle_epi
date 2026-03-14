@@ -17,6 +17,7 @@ class Colaborador(models.Model):
     setor = models.CharField(max_length=30)
     cpf = models.CharField(max_length=11)
     fotoColaborador = models.ImageField(upload_to='static/fotos_colaboradores/', blank=True, null=True)
+    is_ativo = models.BooleanField(default=True)
 
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -88,6 +89,16 @@ class Emprestimo (models.Model):
                     "A data de devolução deve ser posterior à data de empréstimo."
                 )
 
+        # Validação se usuário está ativo
+        if self.colaborador and not getattr(self.colaborador, 'is_ativo', True):
+            raise ValidationError(
+                f"O colaborador '{self.colaborador}' está inativo e não pode realizar empréstimos."
+            )
+
+    def save(self, *args, **kwargs):
+
+        self.full_clean()  # Garante que as validações do clean() sejam aplicadas antes de salvar
+        super().save(*args, **kwargs)  # Salva o objeto Emprestimo no banco de dados
 
     def __str__(self):
         # mostra "Colaborador - EPI" usando o nome do aparelho
