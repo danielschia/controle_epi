@@ -240,3 +240,6 @@ footer {
     color: #666;
     margin-top: 30px;
 }
+#id_is_ativo {
+    width: 5%;
+}
