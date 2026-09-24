@@ -15,7 +15,7 @@ def test_create_test_users_command():
     from django.core.management import call_command
     from epi_admin.models import Gerente
 
-    call_command('create_test_users')
+    call_command('create_test_users', password='local-test-password')
 
     assert Gerente.objects.count() >= 2
 

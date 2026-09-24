@@ -1,158 +1,121 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.db import transaction
-from epi_admin.models import Colaborador, Gerente
+import os
 import random
 
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group, Permission
+from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
+
+from epi_admin.models import Colaborador, Gerente
 
 
 class Command(BaseCommand):
-    help = "Create test gerente users and add them to the 'Gerentes' group (idempotent)."
+    help = "Create demo users and add them to the 'Gerentes' group (idempotent)."
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--password",
-            dest="password",
-            help="Password to set for the test users (default: gerente)",
-            default="gerente",
+            '--password',
+            dest='password',
+            help='Password for demo users (or set DJANGO_GERENTE_PASSWORD)',
+            default=None,
         )
         parser.add_argument(
-            "--force",
-            action="store_true",
-            dest="force",
-            help="If set, reset password for existing users",
+            '--force',
+            action='store_true',
+            dest='force',
+            help='Reset passwords for existing demo users',
         )
 
     @transaction.atomic
     def handle(self, *args, **options):
         User = get_user_model()
-        password = options.get("password") or "gerente"
-        force = options.get("force")
-
+        password = options.get('password') or os.environ.get('DJANGO_GERENTE_PASSWORD')
+        if not password:
+            raise CommandError(
+                'Informe --password ou defina DJANGO_GERENTE_PASSWORD para criar usuários de teste.'
+            )
+        force = options.get('force')
         test_users = [
-            ("gerente1", "gerente1@example.local"),
-            ("gerente2", "gerente2@example.local"),
+            ('gerente1', 'gerente1@example.local'),
+            ('gerente2', 'gerente2@example.local'),
         ]
 
-        group_name = "Gerentes"
-        group, created = Group.objects.get_or_create(name=group_name)
+        group, created = Group.objects.get_or_create(name='Gerentes')
         if created:
-            self.stdout.write(self.style.SUCCESS(f"Created group '{group_name}'"))
+            self.stdout.write(self.style.SUCCESS("Created group 'Gerentes'"))
         else:
-            self.stdout.write(f"Using existing group '{group_name}'")
+            self.stdout.write("Using existing group 'Gerentes'")
 
-        # Ensure the group has model permissions for Colaborador, EPI and Emprestimo
-        app_label = "epi_admin"
-        model_names = ["colaborador", "epi", "emprestimo"]
-        perms_to_add = []
+        model_names = ['colaborador', 'epi', 'emprestimo']
+        permissions = []
         for model in model_names:
-            for action in ("add", "change", "delete", "view"):
-                codename = f"{action}_{model}"
-                try:
-                    perm = Permission.objects.get(content_type__app_label=app_label, codename=codename)
-                    perms_to_add.append(perm)
-                except Permission.DoesNotExist:
-                    # Skip silently; migrations/bootstrapping should create permissions
-                    self.stdout.write(self.style.WARNING(f"Permission not found: {codename} (skipping)"))
-
-        if perms_to_add:
-            group.permissions.add(*perms_to_add)
-            self.stdout.write(self.style.SUCCESS(f"Assigned permissions for models: {', '.join(model_names)} to group '{group_name}'"))
+            for action in ('add', 'change', 'delete', 'view'):
+                permission = Permission.objects.filter(
+                    content_type__app_label='epi_admin',
+                    codename=f'{action}_{model}',
+                ).first()
+                if permission:
+                    permissions.append(permission)
+        if permissions:
+            group.permissions.add(*permissions)
+            self.stdout.write(self.style.SUCCESS("Assigned standard model permissions"))
 
         created_any = False
         for username, email in test_users:
-            user_qs = User.objects.filter(username=username)
-            if user_qs.exists():
-                user = user_qs.first()
-                if force:
-                    user.set_password(password)
-                    user.is_staff = True
-                    user.save()
-                    self.stdout.write(self.style.SUCCESS(f"Updated password for existing user: {username}"))
-                else:
-                    self.stdout.write(f"User exists: {username} (use --force to reset password)")
+            user = User.objects.filter(username=username).first()
+            if user is None:
+                user = User.objects.create_user(
+                    username=email,
+                    email=email,
+                    password=password,
+                )
+                user.is_staff = True
+                user.save()
+                created_any = True
+                self.stdout.write(self.style.SUCCESS(f'Created demo user: {email}'))
+            elif force:
+                user.set_password(password)
+                user.is_staff = True
+                user.save()
+                self.stdout.write(self.style.SUCCESS(f'Updated demo user: {email}'))
             else:
-                # avoid IntegrityError: check whether a user with username==email already exists
-                if User.objects.filter(username=email).exists():
-                    user = User.objects.get(username=email)
-                    self.stdout.write(self.style.WARNING(f"Found existing user with username=email: {user.username}. Using existing account."))
-                else:
-                    user = User.objects.create_user(username=email, email=email, password=password)
-                    user.is_staff = True
-                    user.save()
-                    self.stdout.write(self.style.SUCCESS(f"Created user: {user.username} / {email}"))
-                    created_any = True
+                self.stdout.write(f'Demo user already exists: {email}')
 
-            # Add user to group if not already
-            if not user.groups.filter(name=group_name).exists():
+            if not user.groups.filter(name=group.name).exists():
                 user.groups.add(group)
-                self.stdout.write(self.style.SUCCESS(f"Added {username} to group '{group_name}'"))
 
-            # Create or update associated Gerente object (idempotent)
-            # ensure we provide a unique cpf and set the email to user.email when creating
             cpf_candidate = ''.join(str(random.randint(0, 9)) for _ in range(11))
             while Gerente.objects.filter(cpf=cpf_candidate).exists():
                 cpf_candidate = ''.join(str(random.randint(0, 9)) for _ in range(11))
 
-            defaults = {
-                'nome': username.capitalize(),
-                'sobrenome': 'Test',
-                'setor': 'Geral',
-                'cpf': cpf_candidate,
-                'email': user.email,
-            }
+            gerente, gerente_created = Gerente.objects.get_or_create(
+                user=user,
+                defaults={
+                    'nome': username.capitalize(),
+                    'sobrenome': 'Demonstração',
+                    'setor': 'Geral',
+                    'cpf': cpf_candidate,
+                    'email': user.email,
+                },
+            )
+            if gerente_created:
+                self.stdout.write(self.style.SUCCESS(f'Created Gerente for {email}'))
+            elif gerente.email != user.email:
+                gerente.email = user.email
+                gerente.save()
 
-            gerente, created = Gerente.objects.get_or_create(user=user, defaults=defaults)
-            if created:
-                self.stdout.write(self.style.SUCCESS(f"Created Gerente for user: {user.username}"))
-            else:
-                # if gerent exists but email is missing or different, ensure it's synced
-                updated = False
-                if gerente.email != user.email:
-                    gerente.email = user.email
-                    updated = True
-                if updated:
-                    gerente.save()
-                    self.stdout.write(self.style.SUCCESS(f"Updated Gerente email for user: {user.username}"))
-                else:
-                    self.stdout.write(f"Gerente already exists for user: {user.username}")
-
-            # Create up to 3 Colaborador records for this gerente (idempotent)
-            try:
-                existing = Colaborador.objects.filter(created_by=user).count()
-            except Exception:
-                existing = 0
-
-            needed = max(0, 3 - existing)
-            if needed > 0:
-                first_names = ['Ana', 'Bruno', 'Carlos', 'Daniela', 'Eduardo', 'Fernanda', 'Gustavo', 'Helena', 'Igor', 'Julia']
-                last_names = ['Silva', 'Souza', 'Oliveira', 'Santos', 'Pereira', 'Costa', 'Almeida', 'Gomes', 'Ribeiro', 'Fernandes']
-                created = 0
-                attempts = 0
-                while created < needed and attempts < 20:
-                    attempts += 1
-                    fn = random.choice(first_names)
-                    ln = random.choice(last_names)
-                    # avoid exact duplicates for this user
-                    if Colaborador.objects.filter(nome=fn, sobrenome=ln, created_by=user).exists():
-                        continue
-                    # create collaborator with a random cpf-like string
-                    cpf = ''.join(str(random.randint(0, 9)) for _ in range(11))
-                    col = Colaborador.objects.create(
-                        nome=fn,
-                        sobrenome=ln,
-                        setor='Geral',
-                        cpf=cpf,
-                        created_by=user,
-                    )
-                    created += 1
-                    self.stdout.write(self.style.SUCCESS(f"Created Colaborador {fn} {ln} for {username}"))
-                if created < needed:
-                    self.stdout.write(self.style.WARNING(f"Could only create {created} of {needed} colaboradores for {username}"))
+            existing = Colaborador.objects.filter(created_by=user).count()
+            first_names = ['Ana', 'Bruno', 'Carla', 'Diego', 'Elisa', 'Felipe', 'Sofia']
+            last_names = ['Exemplo', 'Demonstração', 'Teste']
+            for index in range(max(0, 3 - existing)):
+                Colaborador.objects.create(
+                    nome=first_names[index % len(first_names)],
+                    sobrenome=last_names[index % len(last_names)],
+                    setor='Geral',
+                    cpf=''.join(str(random.randint(0, 9)) for _ in range(11)),
+                    created_by=user,
+                )
 
         if not created_any:
-            self.stdout.write(self.style.NOTICE("No new test users were created."))
-
-        self.stdout.write(self.style.SUCCESS("create_test_users finished."))
+            self.stdout.write(self.style.NOTICE('No new demo users were created.'))
+        self.stdout.write(self.style.SUCCESS('create_test_users finished.'))
