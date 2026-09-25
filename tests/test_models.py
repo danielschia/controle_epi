@@ -1,6 +1,6 @@
 import pytest
-from django.core.exceptions import ValidationError
 
+from django.core.exceptions import ValidationError
 from epi_admin.models import Colaborador, Emprestimo, EPI, Gerente
 
 @pytest.mark.django_db

@@ -95,11 +95,6 @@ class Emprestimo (models.Model):
                 f"O colaborador '{self.colaborador}' está inativo e não pode realizar empréstimos."
             )
 
-    def save(self, *args, **kwargs):
-
-        self.full_clean()  # Garante que as validações do clean() sejam aplicadas antes de salvar
-        super().save(*args, **kwargs)  # Salva o objeto Emprestimo no banco de dados
-
     def __str__(self):
         # mostra "Colaborador - EPI" usando o nome do aparelho
         epi_nome = getattr(self.epi_nome, 'nomeAparelho', str(self.epi_nome))
