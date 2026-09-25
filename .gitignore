@@ -1,5 +1,162 @@
+# ==============================================================
+# Controle EPI — .gitignore
+#
+# Organizado por categoria. Ao adicionar um padrão, prefira padrões
+# ancorados (ex.: /media/ em vez de media/) para não ignorar
+# arquivos versionados do projeto por acidente.
+# ==============================================================
+
+
+# ------------------------------------------------------------------
+# Sistema operacional / Finder
+# ------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+Icon?
+
+
+# ------------------------------------------------------------------
+# Editores e IDEs
+# ------------------------------------------------------------------
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+
+# ------------------------------------------------------------------
+# Python — cache e compilados
+# ------------------------------------------------------------------
 __pycache__/
-*.pyc
-media/
+*.py[cod]
+*$py.class
+*.so
+.Python
+/build/
+/dist/
+/wheels/
+*.egg-info/
+*.egg
+.installed.cfg
+MANIFEST
+
+
+# ------------------------------------------------------------------
+# Ambientes virtuais
+# ------------------------------------------------------------------
 .venv/
-db.sqlite3
+venv/
+env/
+ENV/
+venv.bak/
+env.bak/
+.venv.bak/
+
+
+# ------------------------------------------------------------------
+# Django — banco de dados
+# ------------------------------------------------------------------
+# O SQLite NUNCA deve ser versionado: o arquivo contém hashes de
+# senha, sessões ativas e dados pessoais (colaboradores, gerentes,
+# empréstimos). Cada pessoa gera o próprio banco com `migrate`.
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+*.sqlite
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+db.sqlite3*
+data.db
+*.dump
+*.sql
+
+
+# ------------------------------------------------------------------
+# Django — segredos e configuração local
+# ------------------------------------------------------------------
+# local_settings.py é a convenção do Django para sobrescrever
+# settings sem alterar o arquivo versionado.
+local_settings.py
+*_local_settings.py
+settings_local.py
+.env
+.env.*
+!.env.example
+
+# Chaves, certificados e credenciais
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.p8
+secrets.json
+credentials.json
+service-account*.json
+id_rsa
+id_rsa.*
+id_ed25519
+.netrc
+
+
+# ------------------------------------------------------------------
+# Django — uploads (MEDIA_ROOT) e arquivos coletados (STATIC_ROOT)
+# ------------------------------------------------------------------
+# Ancorados na raiz: o static de cada app (epi_admin/static/)
+# continua versionado normalmente.
+/media/
+/static/
+/staticfiles/
+local_settings.local
+
+
+# ------------------------------------------------------------------
+# Testes, cobertura e análise estática
+# ------------------------------------------------------------------
+.pytest_cache/
+.cache/
+.tox/
+.nox/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+
+
+# ------------------------------------------------------------------
+# Logs e arquivos temporários
+# ------------------------------------------------------------------
+*.log
+*.bak
+*.orig
+*.rej
+*.tmp
+*.swp
