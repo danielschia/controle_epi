@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+from django.db.models import Q
 
 from epi_admin.models import Colaborador, Gerente
 
@@ -62,7 +63,9 @@ class Command(BaseCommand):
 
         created_any = False
         for username, email in test_users:
-            user = User.objects.filter(username=username).first()
+            user = User.objects.filter(
+                Q(username=username) | Q(username=email)
+            ).first()
             if user is None:
                 user = User.objects.create_user(
                     username=email,
