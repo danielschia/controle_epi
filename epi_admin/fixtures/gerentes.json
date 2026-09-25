@@ -4,8 +4,9 @@
     "pk": 1,
     "fields": {
       "nome": "Gerente",
-      "sobrenome": "Um",
+      "sobrenome": "Exemplo",
       "setor": "RH",
+      "email": "gerente1@example.local",
       "cpf": "00000000001",
       "fotoGerente": null
     }
@@ -15,8 +16,9 @@
     "pk": 2,
     "fields": {
       "nome": "Gerente",
-      "sobrenome": "Dois",
+      "sobrenome": "Exemplo",
       "setor": "Produção",
+      "email": "gerente2@example.local",
       "cpf": "00000000002",
       "fotoGerente": null
     }
