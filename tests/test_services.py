@@ -1,8 +1,10 @@
 import datetime
-import pytest
 
-from epi_admin.models import Colaborador, EPI
+import pytest
 from django.core.exceptions import ValidationError
+
+from epi_admin.models import EPI, Colaborador
+
 
 @pytest.fixture
 def estoque():
@@ -43,7 +45,7 @@ def test_devolucao_boa_devolve_item_ao_estoque(estoque, colaborador):
     epi = estoque
     colaborador = colaborador
 
-    from epi_admin.services import registrar_emprestimo, registrar_devolucao
+    from epi_admin.services import registrar_devolucao, registrar_emprestimo
     emprestimo = registrar_emprestimo(
         colaborador=colaborador, epi=epi,
         data_emprestimo=datetime.date.today())
@@ -61,7 +63,7 @@ def test_devolucao_ruim_nao_devolve_item_ao_estoque(estoque, colaborador):
     epi = estoque
     colaborador = colaborador
 
-    from epi_admin.services import registrar_emprestimo, registrar_devolucao
+    from epi_admin.services import registrar_devolucao, registrar_emprestimo
     emprestimo = registrar_emprestimo(
         colaborador=colaborador, epi=epi,
         data_emprestimo=datetime.date.today())
@@ -76,7 +78,7 @@ def test_devolucao_ruim_nao_devolve_item_ao_estoque(estoque, colaborador):
 
 @pytest.mark.django_db
 def test_excluir_emprestimo_restaura_estoque(estoque, colaborador):
-    from epi_admin.services import registrar_emprestimo, excluir_emprestimo
+    from epi_admin.services import excluir_emprestimo, registrar_emprestimo
     emprestimo = registrar_emprestimo(
         colaborador=colaborador, epi=estoque,
         data_emprestimo=datetime.date.today())
@@ -88,7 +90,11 @@ def test_excluir_emprestimo_restaura_estoque(estoque, colaborador):
 
 @pytest.mark.django_db
 def test_excluir_emprestimo_devolvido_nao_credita_de_novo(estoque, colaborador):
-    from epi_admin.services import registrar_emprestimo, registrar_devolucao, excluir_emprestimo
+    from epi_admin.services import (
+        excluir_emprestimo,
+        registrar_devolucao,
+        registrar_emprestimo,
+    )
     emprestimo = registrar_emprestimo(
         colaborador=colaborador, epi=estoque,
         data_emprestimo=datetime.date.today())
@@ -108,7 +114,7 @@ def test_excluir_emprestimo_devolvido_nao_credita_de_novo(estoque, colaborador):
 
 @pytest.mark.django_db
 def test_registrar_devolucao_sem_data_nao_apaga_devolucao_existente(estoque, colaborador):
-    from epi_admin.services import registrar_emprestimo, registrar_devolucao
+    from epi_admin.services import registrar_devolucao, registrar_emprestimo
     emprestimo = registrar_emprestimo(
         colaborador=colaborador, epi=estoque,
         data_emprestimo=datetime.date.today())
@@ -135,7 +141,7 @@ def test_registrar_devolucao_sem_data_nao_apaga_devolucao_existente(estoque, col
 
 @pytest.mark.django_db
 def test_registrar_devolucao_nao_credita_de_novo_quando_corrige_data(estoque, colaborador):
-    from epi_admin.services import registrar_emprestimo, registrar_devolucao
+    from epi_admin.services import registrar_devolucao, registrar_emprestimo
     emprestimo = registrar_emprestimo(
         colaborador=colaborador, epi=estoque,
         data_emprestimo=datetime.date.today()

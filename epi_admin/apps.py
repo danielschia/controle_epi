@@ -1,5 +1,6 @@
-from django.apps import AppConfig
 import logging
+
+from django.apps import AppConfig
 
 
 class EpiAdminConfig(AppConfig):
@@ -18,7 +19,6 @@ class EpiAdminConfig(AppConfig):
         logger = logging.getLogger(__name__)
 
         # Defer database setup until Django signals that apps are ready
-        from django.core.management import call_command
         from django.db.models.signals import post_migrate
         from django.dispatch import receiver
 
@@ -26,11 +26,8 @@ class EpiAdminConfig(AppConfig):
         def setup_groups_and_permissions(sender, **kwargs):
             """Called after migrations complete; safe to access the database."""
             try:
-                from django.contrib.auth import get_user_model
                 from django.contrib.auth.models import Group, Permission
                 from django.db import OperationalError, ProgrammingError
-
-                User = get_user_model()
 
                 # Ensure the 'Gerentes' group with permissions for colaborador, epi and emprestimo only.
                 models = ['colaborador', 'epi', 'emprestimo']

@@ -1,16 +1,32 @@
-from epi_admin.services import registrar_emprestimo, registrar_devolucao, excluir_emprestimo
-from django.shortcuts import redirect
-from django.db.models import ProtectedError
-from django.contrib.auth import logout as auth_logout
-from django.http import HttpResponseRedirect
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
-from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    UserPassesTestMixin,
+)
 from django.contrib.auth.models import Group
-from .forms import ColaboradorForm, GerenteForm, EPIForm, EmprestimoForm
-from epi_admin.models import Colaborador, Gerente, EPI, Emprestimo
+from django.db.models import ProtectedError
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
+
+from epi_admin.models import EPI, Colaborador, Emprestimo, Gerente
+from epi_admin.services import (
+    excluir_emprestimo,
+    registrar_devolucao,
+    registrar_emprestimo,
+)
+
+from .forms import ColaboradorForm, EmprestimoForm, EPIForm, GerenteForm
 
 
 # ==================== CUSTOM LOGOUT ====================

@@ -1,7 +1,7 @@
 import pytest
 
-from django.core.exceptions import ValidationError
-from epi_admin.models import Colaborador, Emprestimo, EPI, Gerente
+from epi_admin.models import Colaborador, Gerente
+
 
 @pytest.mark.django_db
 def test_create_user(django_user_model: Gerente):
@@ -13,6 +13,7 @@ def test_create_user(django_user_model: Gerente):
 @pytest.mark.django_db
 def test_create_test_users_command():
     from django.core.management import call_command
+
     from epi_admin.models import Gerente
 
     call_command('create_test_users', password='local-test-password')
@@ -22,6 +23,7 @@ def test_create_test_users_command():
 @pytest.mark.django_db
 def test_create_test_users_command_is_idempotent():
     from django.core.management import call_command
+
     from epi_admin.models import Gerente
 
     call_command('create_test_users', password='local-test-password')

@@ -1,0 +1,7 @@
+target-version = "py311"
+line-length = 100
+exclude = ["venv", ".venv", "media", "static", "migrations"]
+
+[lint]
+select = ["E", "F", "W", "I", "B"]
+ignore = ["E501"]

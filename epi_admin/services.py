@@ -1,6 +1,9 @@
-from epi_admin.models import Emprestimo
-from django.core.exceptions import ValidationError
 from datetime import timedelta
+
+from django.core.exceptions import ValidationError
+
+from epi_admin.models import Emprestimo
+
 
 def registrar_emprestimo(*, colaborador, epi, data_emprestimo) -> Emprestimo:
     if not colaborador.is_ativo:
@@ -12,7 +15,7 @@ def registrar_emprestimo(*, colaborador, epi, data_emprestimo) -> Emprestimo:
         raise ValidationError(
             f"Não há unidades disponíveis do EPI {epi} para empréstimo."
         )
-    
+
     emprestimo = Emprestimo.objects.create(
         colaborador=colaborador,
         epi_nome=epi,
@@ -37,7 +40,7 @@ def registrar_devolucao(*, emprestimo, data_devolucao, condicao_devolucao) -> Em
     if depois_credita and not antes_credita:
         emprestimo.epi_nome.quantidade += 1
         emprestimo.epi_nome.save()
-        
+
     emprestimo.save()
     return emprestimo
 

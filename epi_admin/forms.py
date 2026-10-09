@@ -1,9 +1,10 @@
 from datetime import date
-from django import forms
-from django.core.exceptions import ValidationError
-from django.contrib.auth import get_user_model
-from .models import EPI, Emprestimo, Colaborador, Gerente
 
+from django import forms
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+
+from .models import EPI, Colaborador, Emprestimo, Gerente
 
 DATE_FORMAT = '%d/%m/%y'
 
@@ -162,8 +163,6 @@ class EmprestimoForm(forms.ModelForm):
         cleaned_data = super().clean()
         data_emprestimo = cleaned_data.get("data_emprestimo")
         data_prevista = cleaned_data.get("data_prevista")
-        data_devolucao = cleaned_data.get("data_devolucao")
-
 
         if isinstance(data_emprestimo, date) and isinstance(data_prevista, date):
             # Agora a comparação é segura

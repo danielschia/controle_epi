@@ -1,6 +1,8 @@
 from django.contrib import admin as django_admin
+
 from controle_epi.admin_site import admin_site
-from .models import Colaborador, Gerente, EPI, Emprestimo
+
+from .models import EPI, Colaborador, Emprestimo, Gerente
 
 
 class ColaboradorAdmin(django_admin.ModelAdmin):

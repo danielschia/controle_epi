@@ -1,8 +1,7 @@
-from datetime import timedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import CheckConstraint, F, Q
+from django.db.models import CheckConstraint, Q
 
 CONDICAO_CHOICES = (
     ('BOA', 'Boa'),
@@ -97,7 +96,7 @@ class Emprestimo (models.Model):
         ]
 
     def save(self, *args, **kwargs):
-        
+
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
