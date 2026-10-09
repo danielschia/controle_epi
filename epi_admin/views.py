@@ -1,4 +1,6 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from epi_admin.services import registrar_emprestimo, registrar_devolucao, excluir_emprestimo
+from django.shortcuts import redirect
+from django.db.models import ProtectedError
 from django.contrib.auth import logout as auth_logout
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
@@ -7,10 +9,8 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.utils.crypto import get_random_string
-from .models import Colaborador, Gerente, EPI, Emprestimo
 from .forms import ColaboradorForm, GerenteForm, EPIForm, EmprestimoForm
-
+from epi_admin.models import Colaborador, Gerente, EPI, Emprestimo
 
 
 # ==================== CUSTOM LOGOUT ====================
@@ -67,8 +67,11 @@ class ColaboradorDeleteView(UserPassesTestMixin, LoginRequiredMixin, DeleteView)
         return obj.created_by == user and user.has_perm('epi_admin.delete_colaborador')
 
     def delete(self, request, *args, **kwargs):
-        messages.success(request, 'Colaborador deletado com sucesso!')
-        return super().delete(request, *args, **kwargs)
+        try:
+            return super().delete(request, *args, **kwargs)
+        except ProtectedError:
+            messages.error(request, 'Não é possível excluir: há empréstimos activos registrados.')
+            return redirect(self.success_url)
 
 
 class ColaboradorDetailView(LoginRequiredMixin, DetailView):
@@ -263,8 +266,11 @@ class EPIDeleteView(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('epi_list')
 
     def delete(self, request, *args, **kwargs):
-        messages.success(request, 'EPI deletado com sucesso!')
-        return super().delete(request, *args, **kwargs)
+        try:
+            return super().delete(request, *args, **kwargs)
+        except ProtectedError:
+            messages.error(request, 'Não é possível excluir: há empréstimos registados para este EPI.')
+            return redirect(self.success_url)
 
 
 class EPIDetailView(LoginRequiredMixin, DetailView):
@@ -290,8 +296,13 @@ class EmprestimoCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateVi
     success_url = reverse_lazy('emprestimo_list')
 
     def form_valid(self, form):
+        registrar_emprestimo(
+            colaborador=form.cleaned_data["colaborador"],
+            epi=form.cleaned_data["epi_nome"],
+            data_emprestimo=form.cleaned_data["data_emprestimo"]
+        )
         messages.success(self.request, 'Empréstimo criado com sucesso!')
-        return super().form_valid(form)
+        return redirect(self.success_url)
 
 
 class EmprestimoUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
@@ -302,8 +313,13 @@ class EmprestimoUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateVi
     success_url = reverse_lazy('emprestimo_list')
 
     def form_valid(self, form):
+        registrar_devolucao(
+            emprestimo=form.instance,
+            data_devolucao=form.cleaned_data["data_devolucao"],
+            condicao_devolucao=form.cleaned_data["condicao_devolucao"]
+        )
         messages.success(self.request, 'Empréstimo atualizado com sucesso!')
-        return super().form_valid(form)
+        return redirect(self.success_url)
 
 
 class EmprestimoDeleteView(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
@@ -313,9 +329,9 @@ class EmprestimoDeleteView(PermissionRequiredMixin, LoginRequiredMixin, DeleteVi
     success_url = reverse_lazy('emprestimo_list')
 
     def delete(self, request, *args, **kwargs):
+        excluir_emprestimo(emprestimo=self.get_object())
         messages.success(request, 'Empréstimo deletado com sucesso!')
-        return super().delete(request, *args, **kwargs)
-
+        return redirect(self.success_url)
 
 class EmprestimoDetailView(LoginRequiredMixin, DetailView):
     model = Emprestimo
