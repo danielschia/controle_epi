@@ -56,7 +56,7 @@ class EPI(models.Model):
 
 class Emprestimo (models.Model):
     colaborador = models.ForeignKey(Colaborador, on_delete=models.PROTECT)
-    epi_nome = models.ForeignKey(EPI, on_delete=models.CASCADE)
+    epi_nome = models.ForeignKey(EPI, on_delete=models.PROTECT)
     data_emprestimo = models.DateField()
     data_prevista = models.DateField(blank=True, null=True)
     data_devolucao = models.DateField("Registrar Devolução", blank=True, null=True)
