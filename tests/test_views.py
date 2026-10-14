@@ -1,0 +1,32 @@
+import datetime
+import pytest
+
+from epi_admin.models import Colaborador
+
+
+@pytest.mark.django_db
+def test_deletar_colaborador_com_emprestimo_registrado_e_bloqueado(estoque, colaborador):
+    from epi_admin.services import registrar_emprestimo
+    from django.db.models import ProtectedError
+
+    registrar_emprestimo(colaborador=colaborador, epi=estoque,
+                         data_emprestimo=datetime.date.today())
+
+    with pytest.raises(ProtectedError):
+        colaborador.delete()
+
+@pytest.mark.django_db
+def test_view_delete_colaborador_bloqueado_mostra_mensagem(client, django_user_model, estoque, colaborador):
+    from epi_admin.services import registrar_emprestimo
+    registrar_emprestimo(colaborador=colaborador, epi=estoque,
+                         data_emprestimo=datetime.date.today())
+
+    user = django_user_model.objects.create_user(username="admin", password="Abcdef123!")
+    user.is_superuser = True
+    user.save()
+    client.force_login(user)
+
+    resp = client.post(f"/epi_admin/colaboradores/{colaborador.pk}/deletar/")
+
+    assert resp.status_code == 302                    
+    assert Colaborador.objects.filter(pk=colaborador.pk).exists()

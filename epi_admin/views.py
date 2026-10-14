@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import (
 )
 from django.contrib.auth.models import Group
 from django.db.models import ProtectedError
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, request
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import (
@@ -82,13 +82,12 @@ class ColaboradorDeleteView(UserPassesTestMixin, LoginRequiredMixin, DeleteView)
         # require both ownership and delete permission
         return obj.created_by == user and user.has_perm('epi_admin.delete_colaborador')
 
-    def delete(self, request, *args, **kwargs):
+    def form_valid(self, form):
         try:
-            return super().delete(request, *args, **kwargs)
+            return super().form_valid(form)
         except ProtectedError:
-            messages.error(request, 'Não é possível excluir: há empréstimos activos registrados.')
+            messages.error(self.request, 'Não é possível excluir: existem empréstimos ativos registrados')
             return redirect(self.success_url)
-
 
 class ColaboradorDetailView(LoginRequiredMixin, DetailView):
     model = Colaborador

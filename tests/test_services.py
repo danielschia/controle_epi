@@ -5,27 +5,6 @@ from django.core.exceptions import ValidationError
 
 from epi_admin.models import EPI, Colaborador
 
-
-@pytest.fixture
-def estoque():
-    epi = EPI.objects.create(
-            nomeAparelho="Capacete",
-            categoria="Proteção",
-            quantidade=10,
-            validade=datetime.date.today() + datetime.timedelta(days=365)
-        )
-    return epi
-
-@pytest.fixture
-def colaborador():
-    colaborador = Colaborador.objects.create(
-        nome="João",
-        sobrenome="Silva",
-        setor="Engenharia",
-        cpf="12345678901"
-    )
-    return colaborador
-
 @pytest.mark.django_db
 def test_registrar_emprestimo_decrementa_estoque_em_um(estoque, colaborador):
     epi = estoque
