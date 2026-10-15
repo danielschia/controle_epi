@@ -31,7 +31,11 @@ def registrar_devolucao(*, emprestimo, data_devolucao, condicao_devolucao) -> Em
         return emprestimo
 
     """Item só vale de volta se estiver em boas condições."""
-    antes_credita = emprestimo.condicao_devolucao in ("BOA", "USAVEL")
+    condicao_anterior= (
+        Emprestimo.objects.filter(pk=emprestimo.pk)
+        .values_list("condicao_devolucao", flat=True).first()
+    )
+    antes_credita = condicao_anterior in ("BOA", "USAVEL")
     depois_credita = condicao_devolucao in ("BOA", "USAVEL")
 
     emprestimo.data_devolucao = data_devolucao

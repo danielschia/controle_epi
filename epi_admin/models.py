@@ -76,7 +76,7 @@ class Emprestimo (models.Model):
         super().clean()
         # Validação de data (se a data de devolução for informada no modelo)
         if self.data_emprestimo and self.data_devolucao:
-            if self.data_devolucao <= self.data_emprestimo:
+            if self.data_devolucao < self.data_emprestimo:
                 raise ValidationError(
                     "A data de devolução deve ser posterior à data de empréstimo."
                 )
