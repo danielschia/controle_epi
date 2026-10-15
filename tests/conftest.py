@@ -1,7 +1,8 @@
 import datetime
+
 import pytest
 
-from epi_admin.models import Colaborador, EPI
+from epi_admin.models import EPI, Colaborador
 
 
 @pytest.fixture

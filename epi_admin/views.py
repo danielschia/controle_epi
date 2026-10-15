@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import (
 )
 from django.contrib.auth.models import Group
 from django.db.models import ProtectedError
-from django.http import HttpResponseRedirect, request
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import (

@@ -3,7 +3,8 @@ import datetime
 import pytest
 from django.core.exceptions import ValidationError
 
-from epi_admin.models import EPI, Colaborador
+from epi_admin.models import Colaborador
+
 
 @pytest.mark.django_db
 def test_registrar_emprestimo_decrementa_estoque_em_um(estoque, colaborador):
